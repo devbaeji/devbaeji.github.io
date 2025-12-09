@@ -1,6 +1,6 @@
 ---
 title: "[Troubleshooting] 카테고리 소개"
-date: 2025-01-01 05:00:00 +0900
+date: 2025-12-09 05:00:00 +0900
 categories: [Troubleshooting]
 tags: [debug, error, incident, postmortem]
 ---

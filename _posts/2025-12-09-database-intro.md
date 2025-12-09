@@ -1,6 +1,6 @@
 ---
 title: "[Database] 카테고리 소개"
-date: 2025-01-01 02:00:00 +0900
+date: 2025-12-09 02:00:00 +0900
 categories: [Database]
 tags: [mysql, redis, query]
 ---

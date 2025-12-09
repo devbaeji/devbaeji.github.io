@@ -1,6 +1,6 @@
 ---
 title: "[Architecture] 카테고리 소개"
-date: 2025-01-01 04:00:00 +0900
+date: 2025-12-09 04:00:00 +0900
 categories: [Architecture]
 tags: [design-pattern, msa, ddd, architecture]
 ---

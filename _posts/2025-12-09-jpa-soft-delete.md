@@ -1,6 +1,6 @@
 ---
 title: "JPA에서 Soft Delete 구현하는 방법"
-date: 2025-01-09 17:00:00 +0900
+date: 2025-12-09 17:00:00 +0900
 categories: [Backend, JPA]
 tags: [jpa, soft-delete, spring]
 ---

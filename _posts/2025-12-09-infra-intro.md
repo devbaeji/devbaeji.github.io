@@ -1,6 +1,6 @@
 ---
 title: "[Infra] 카테고리 소개"
-date: 2025-01-01 03:00:00 +0900
+date: 2025-12-09 03:00:00 +0900
 categories: [Infra]
 tags: [aws, docker, kubernetes, cicd, github-actions, argocd]
 ---
