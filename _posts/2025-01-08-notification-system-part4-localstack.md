@@ -39,7 +39,7 @@ version: '3.8'
 services:
   localstack:
     image: localstack/localstack:latest
-    container_name: localstack-spation
+    container_name: localstack-mytest
     ports:
       - "4566:4566"  # 모든 AWS 서비스 엔드포인트
     environment:
@@ -55,10 +55,10 @@ services:
       - "../apps/lambdas:/tmp/lambdas"
       - "./init:/etc/localstack/init/ready.d"
     networks:
-      - spation-local
+      - mytest-local
 
 networks:
-  spation-local:
+  mytest-local:
     driver: bridge
 ```
 
@@ -91,7 +91,7 @@ echo "🚀 Initializing LocalStack AWS resources..."
 
 # 메인 SQS Queue 생성 (API → router)
 awslocal sqs create-queue \
-  --queue-name ksd-notification-spation-workspace-sqs-local
+  --queue-name ksd-notification-mytest-workspace-sqs-local
 
 # SNS Topics 생성 (채널별)
 awslocal sns create-topic --name gmail-notifications-sns-local
@@ -181,7 +181,7 @@ import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk
 
 const config = {
   endpoint: 'http://localhost:4566',
-  queueName: 'ksd-notification-spation-workspace-sqs-local',
+  queueName: 'ksd-notification-mytest-workspace-sqs-local',
   region: 'ap-northeast-2',
 };
 
@@ -250,7 +250,7 @@ pnpm run local
 ```
 📧 Notification Router Lambda 로컬 디버깅 시작
 📍 LocalStack 엔드포인트: http://localhost:4566
-📬 Main SQS Queue: ksd-notification-spation-workspace-sqs-local
+📬 Main SQS Queue: ksd-notification-mytest-workspace-sqs-local
 
 대기 중... (Ctrl+C로 종료)
 ```
@@ -316,7 +316,7 @@ _IntelliJ에서 Lambda 디버깅_
 # local 프로필 설정
 aws:
   sqs:
-    notification-queue-name: ksd-notification-spation-workspace-sqs-local
+    notification-queue-name: ksd-notification-mytest-workspace-sqs-local
     endpoint: http://localhost:4566
   region: ap-northeast-2
 
@@ -402,7 +402,7 @@ AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test \
 # 큐에 쌓인 메시지 수 확인
 AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test \
   aws --endpoint-url=http://localhost:4566 sqs get-queue-attributes \
-  --queue-url http://localhost:4566/000000000000/ksd-notification-spation-workspace-sqs-local \
+  --queue-url http://localhost:4566/000000000000/ksd-notification-mytest-workspace-sqs-local \
   --attribute-names ApproximateNumberOfMessages
 ```
 

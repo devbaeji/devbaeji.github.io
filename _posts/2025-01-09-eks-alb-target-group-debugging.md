@@ -12,8 +12,8 @@ tags: [eks, alb, target-group, kubernetes, troubleshooting]
 **여러 대상그룹이 `unhealthy` 상태인데, 서비스는 정상 동작하고 있었거든요.**
 
 ```
-k8s-develop-spationw-12505a9270 → 10.0.1.25   unhealthy (ResponseCodeMismatch)
-k8s-develop-spationw-2b5390ae61 → 10.0.2.149  unhealthy (ResponseCodeMismatch)
+k8s-develop-mytest-12505a9270 → 10.0.1.25   unhealthy (ResponseCodeMismatch)
+k8s-develop-mytest-2b5390ae61 → 10.0.2.149  unhealthy (ResponseCodeMismatch)
 k8s-develop-develops-8666b8a80f → 10.0.1.144  unhealthy (ResponseCodeMismatch)
 ```
 
@@ -61,7 +61,7 @@ AWS ALB에는 재밌는 동작 방식이 있어요.
     │
     ├── worker.api.xxx     ──▶  Target Group B ──▶ API Pod (동일)
     │
-    └── dev.spation.com    ──▶  Target Group C ──▶ Web Pod
+    └── dev.mytest.com    ──▶  Target Group C ──▶ Web Pod
 ```
 
 ### Ingress가 뭐지?
@@ -75,18 +75,18 @@ AWS ALB에는 재밌는 동작 방식이 있어요.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: spation-workspace-web-ingress
+  name: mytest-workspace-web-ingress
   annotations:
     alb.ingress.kubernetes.io/healthcheck-path: /api/health
 spec:
   rules:
-    - host: dev.spation.com
+    - host: dev.mytest.com
       http:
         paths:
           - path: /*
             backend:
               service:
-                name: spation-workspace-web
+                name: mytest-workspace-web
                 port: 3000
 ```
 
@@ -118,7 +118,7 @@ done
 ### 2단계: 헬스체크 설정 확인
 
 ```bash
-aws elbv2 describe-target-groups --names k8s-develop-spationw-12505a9270 \
+aws elbv2 describe-target-groups --names k8s-develop-mytest-12505a9270 \
   --query 'TargetGroups[0].{Path:HealthCheckPath,Port:HealthCheckPort,ExpectedCodes:Matcher.HttpCode}' \
   --output table
 ```
@@ -142,7 +142,7 @@ aws elbv2 describe-target-groups --names k8s-develop-spationw-12505a9270 \
 대상그룹 태그를 보면 어떤 Ingress에서 생성됐는지 알 수 있어요.
 
 ```
-ingress.k8s.aws/resource: develop/spation-workspace-web-ingress-internal-spation-workspace-api:80
+ingress.k8s.aws/resource: develop/mytest-workspace-web-ingress-internal-mytest-workspace-api:80
 ```
 
 태그 형식: `{namespace}/{ingress-name}-{service-name}:{port}`
@@ -260,7 +260,7 @@ kubectl get ingress -n develop -o wide
 kubectl get pods -n develop -o wide
 
 # 6. API 로그 실시간 확인
-kubectl logs -f -n develop -l app=spation-workspace-api --tail=100
+kubectl logs -f -n develop -l app=mytest-workspace-api --tail=100
 ```
 
 ---

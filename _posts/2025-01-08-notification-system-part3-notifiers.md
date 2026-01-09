@@ -86,13 +86,13 @@ async function sendEmail(notification: EmailNotificationMessage) {
   });
 
   const mailOptions = {
-    from: `Spation Workspace <${credentials.user}>`,
+    from: `mytest Workspace <${credentials.user}>`,
     to: notification.recipient,
-    subject: notification.subject || 'Spation Workspace 알림',
+    subject: notification.subject || 'mytest Workspace 알림',
     text: notification.message,
     html: `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
-        <h2>Spation Workspace 알림</h2>
+        <h2>mytest Workspace 알림</h2>
         <p>${notification.message}</p>
         <hr>
         <p style="color: #999; font-size: 12px;">
@@ -157,7 +157,7 @@ async function sendSlackMessage(notification: SlackNotificationMessage) {
         type: 'header',
         text: {
           type: 'plain_text',
-          text: notification.metadata?.title || 'Spation Workspace 알림',
+          text: notification.metadata?.title || 'mytest Workspace 알림',
         },
       },
       {
@@ -358,7 +358,7 @@ async function sendKakaoMessage(notification: KakaoNotificationMessage) {
       object_type: 'text',
       text: notification.message,
       link: {
-        web_url: 'https://spation.com',
+        web_url: 'https://mytest.com',
       },
     };
   }

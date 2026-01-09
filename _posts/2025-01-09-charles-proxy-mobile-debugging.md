@@ -134,7 +134,7 @@ http://chls.pro/ssl
 ```http
 # 앱 A (정상 동작)
 POST /api/tickets/schedules HTTP/1.1
-Host: api.spation.com
+Host: api.mytest.com
 Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 Content-Type: application/json
 
@@ -144,7 +144,7 @@ Content-Type: application/json
 ```http
 # 앱 B (DB 저장 안 됨)
 POST /api/tickets/schedules HTTP/1.1
-Host: api.spation.com
+Host: api.mytest.com
 Content-Type: application/json
 
 {"ticketId": 123, "assigneeId": 456}
@@ -159,7 +159,7 @@ Content-Type: application/json
 **1. Filter로 특정 도메인만 보기**
 
 - 하단의 **Filter** 입력창에 도메인 입력
-- 예: `api.spation.com`
+- 예: `api.mytest.com`
 
 **2. 요청 수정해서 다시 보내기 (Compose)**
 
