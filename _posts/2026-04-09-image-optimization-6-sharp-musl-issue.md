@@ -30,7 +30,7 @@ GET /stream-files/12345?w=136&q=75  →  500 Internal Server Error
 원인을 모르겠으니 일단 route 안에 진단 로그부터 깔았어요.
 
 ```ts
-// src/app/stream-files/[...path]/route.ts
+// apps/web/src/app/stream-files/[...path]/route.ts
 console.error('[stream-files] upstream request failed', {
   path: pathString,
   apiUrl,
@@ -191,7 +191,7 @@ supported-architectures[libc][]=glibc
 ```dockerfile
 FROM node:20-alpine AS runner
 # ... standalone COPY
-RUN npm install --os=linux --libc=musl --cpu=x64 sharp --no-save
+RUN cd apps/web && npm install --os=linux --libc=musl --cpu=x64 sharp --no-save
 ```
 
 Alpine 유지하면서 runtime 단계에서 sharp만 다시 설치하는 방법이에요.

@@ -44,7 +44,7 @@ export function ThumbnailImage({ size, ...rest }: Props) {
 
 ### app-commons에 안 둔 이유
 
-우리 모노레포에는 `@ksd/app-commons`라는 공통 패키지가 있어요. 처음엔 거기에 두려고 했는데, **이 패키지는 Next.js에 묶이면 안 된다**는 원칙이 있었어요. (`next/image`를 import하는 순간 React Native나 일반 Node 환경에서 깨져요.)
+우리 모노레포에는 `@app/commons`라는 공통 패키지가 있어요. 처음엔 거기에 두려고 했는데, **이 패키지는 Next.js에 묶이면 안 된다**는 원칙이 있었어요. (`next/image`를 import하는 순간 React Native나 일반 Node 환경에서 깨져요.)
 
 그래서 commons에는 **토큰 상수와 타입**만 두고, 컴포넌트 자체는 각 Next.js 앱(`apps/web`, `apps/worker`) 안에 두기로 했어요. 같은 컴포넌트가 두 군데에 거의 그대로 있는 게 마음에 살짝 걸렸지만, 이게 바운더리를 지키는 비용이라고 생각했어요.
 
