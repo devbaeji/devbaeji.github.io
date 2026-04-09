@@ -1,6 +1,6 @@
 ---
 title: "이미지 최적화 (6) sharp가 Alpine에서 안 돌아가요 — musl vs glibc 삽질기"
-date: 2026-04-09 18:00:00 +0900
+date: 2026-04-09 09:00:00 +0900
 categories: [Infra, Docker]
 tags: [nextjs, sharp, docker, alpine, musl, glibc, debugging]
 ---
