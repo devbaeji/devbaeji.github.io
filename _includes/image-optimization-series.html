@@ -1,0 +1,7 @@
+{% assign titles = "인증이 걸린 이미지에 CDN을 쓸 수 없을 때|/_next/image 동작 구조|Custom Loader|레티나 × imageSizes|래퍼 컴포넌트와 마이그레이션 사고|sharp가 Alpine에서 안 돌아간 이유|EFS PV 캐시 — env 누락 디버깅|PV 캐시 동작 증명|공통 패키지 추출|web PV 미러링과 검증" | split: "|" %}
+{% assign slugs = "image-optimization-1-auth-need|image-optimization-2-next-image-architecture|image-optimization-3-custom-loader|image-optimization-4-retina-imagesizes|image-optimization-5-wrapper-migration|image-optimization-6-sharp-musl-issue|image-optimization-7-pv-disk-cache|image-optimization-8-pv-cache-verification|image-optimization-9-commons-refactor|image-optimization-10-web-pv-mirror" | split: "|" %}
+
+> **이미지 최적화 시리즈**
+{% for title in titles %}{% assign num = forloop.index %}{% assign slug = slugs[forloop.index0] %}{% if num == include.current %}> ({{ num }}) **{{ title }}** ← 현재 글
+{% else %}> ({{ num }}) [{{ title }}](/posts/{{ slug }}/)
+{% endif %}{% endfor %}
