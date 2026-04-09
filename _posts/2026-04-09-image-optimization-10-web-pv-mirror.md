@@ -15,7 +15,7 @@ worker PV 캐시 완료(7편). commons 추출 완료(9편). web에 동일 인프
 
 ```yaml
 # PVC — worker와 동일 스펙, name만 변경
-name: spation-workspace-web-image-cache
+name: test-app-web-image-cache
 accessModes: [ReadWriteMany]
 storageClassName: efs-sc-nextjs
 storage: 5Gi
@@ -54,7 +54,7 @@ pod 삭제 → 새 pod에서 동일 파일 확인. 영속성 검증 완료.
 
 ```bash
 NS=develop
-APP=spation-workspace-web   # worker는 spation-workspace-worker
+APP=test-app-web   # worker는 test-app-worker
 POD=$(kubectl -n $NS get pod -l app=$APP -o jsonpath='{.items[0].metadata.name}')
 
 # 1. 인프라

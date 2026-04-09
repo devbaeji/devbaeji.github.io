@@ -24,7 +24,7 @@ web/worker 양쪽 `route.ts`에 ~120줄의 동일 코드가 중복.
 `image/` 선택. 기존 `getImageSrc`, `kImageSizes` 같은 이미지 유틸과 한 곳에 모인다. `server/` 서브폴더는 barrel에서 제외하면 클라이언트 번들에 `fs`/`sharp`가 섞이지 않는다.
 
 ```
-packages/ksd-app-commons/src/image/
+packages/app-commons/src/image/
 ├── index.ts           # client barrel
 ├── urls.ts            # getImageSrc
 ├── kImageSizes.ts     # 디자인 토큰
@@ -69,10 +69,10 @@ await fs.rename(tmpPath, cachePath);  // POSIX rename = atomic
 
 | 경로 | 런타임 |
 |---|---|
-| `@ksd/app-commons/image` | universal |
-| `@ksd/app-commons/image/server` | 서버 전용 |
+| `@myorg/app-commons/image` | universal |
+| `@myorg/app-commons/image/server` | 서버 전용 |
 
-기존 consumer는 barrel(`from '@ksd/app-commons'`)로 import → 변경 불필요.
+기존 consumer는 barrel(`from '@myorg/app-commons'`)로 import → 변경 불필요.
 
 ## 효과
 
