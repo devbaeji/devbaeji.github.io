@@ -46,6 +46,27 @@ spec:
 - 새 이미지 배포 시 롤링 업데이트 (무중단)
 - 문제 생기면 이전 revision으로 롤백 가능
 
+## 운영 Pod는 왜 최소 3개인가
+
+운영 환경에서 replica를 3개로 설정한 데는 이유가 있다.
+
+**1. 가용성 (HA)**  
+Pod 1개면 재시작 중 요청을 받을 수 없다. 2개면 하나 죽어도 하나가 살아있지만 롤링 업데이트 중 동시에 1개가 내려가면 위험하다. 3개면 롤링 업데이트 중 최소 2개가 항상 서비스 중이다.
+
+**2. 롤링 업데이트 안전성**  
+쿠버네티스 기본 롤링 전략은 `maxUnavailable: 1`이다. 3개 중 1개씩 교체하므로 배포 중에도 2개가 트래픽을 처리한다.
+
+**3. 가용 영역(AZ) 분산**  
+AWS ap-northeast-2(서울)는 AZ가 3개다. Node를 AZ마다 배치하면 Pod 3개가 각 AZ에 1개씩 분산된다. AZ 하나가 장애여도 2개가 살아있다.
+
+```
+AZ-a: spation-workspace-web-xxx-qs7sg
+AZ-b: spation-workspace-web-xxx-tpnfz
+AZ-c: spation-workspace-web-xxx-tzc5d
+```
+
+개발 환경은 replica 1~2개로 비용을 줄이고, 운영은 3개를 최소로 유지하는 이유다.
+
 내부적으로 Deployment → ReplicaSet → Pod 순으로 관리된다. ReplicaSet은 Pod 수를 유지하는 역할이고, 직접 건드릴 일은 거의 없다.
 
 ## Node

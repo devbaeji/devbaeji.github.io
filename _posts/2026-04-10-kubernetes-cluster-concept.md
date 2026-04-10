@@ -47,15 +47,26 @@ ArgoCD
 
 ## 운영 클러스터 접속
 
-`~/.kube/config`에 등록하지 않고 별도 파일로 분리했다.
+`~/.kube/config`에 등록하지 않고 별도 파일로 분리했다. 개발/운영 config를 섞으면 실수로 잘못된 클러스터에 명령 날릴 수 있어서다.
 
 ```bash
-# 운영 kubeconfig 별도 파일에 저장
+# 운영 kubeconfig를 별도 파일에 저장
 aws eks update-kubeconfig --name ksd-prod-eks --region ap-northeast-2 \
   --kubeconfig ~/.kube/baeji-prod-kubeconfig
 
-# alias
-alias kprod="kubectl --kubeconfig=/home/ec2-user/.kube/baeji-prod-kubeconfig"
+# ~/.zshrc
+alias k="kubectl"                                                                      # 개발 (기본 ~/.kube/config → ksd-eks)
+alias kprod="kubectl --kubeconfig=/home/ec2-user/.kube/baeji-prod-kubeconfig"         # 운영 (ksd-prod-eks)
 ```
 
-`k`는 개발, `kprod`는 운영. 컨텍스트 전환이 아니라 명령마다 kubeconfig를 지정하는 방식이라 실수로 잘못된 클러스터에 명령 날릴 일이 없다.
+`k`는 개발, `kprod`는 운영. Git 브랜치 체크아웃처럼 전환하는 게 아니라, 명령마다 어떤 kubeconfig를 쓸지 명시하는 방식이다.
+
+```bash
+# 개발
+k -n develop get pods
+k logs -n develop -f spation-workspace-api-xxx
+
+# 운영
+kprod -n production get pods
+kprod -n production get pvc
+```
