@@ -21,6 +21,8 @@ Pod C: /app/cache/images/                  ← 파일 없음?
 
 ## EBS vs EFS
 
+![RWX AccessModes](/assets/img/posts/image-optimization/RWX_access_modes.png)
+
 | | EBS (블록 스토리지) | EFS (파일 스토리지) |
 |---|---|---|
 | 프로토콜 | 블록 디바이스 | NFS v4 |

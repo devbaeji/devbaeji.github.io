@@ -25,6 +25,8 @@ dev 배포 직후 모든 이미지 요청 500. 로컬에서는 정상.
 
 ## 진짜 원인: `kubectl logs`
 
+![sharp musl 에러 로그](/assets/img/posts/image-optimization/error-log.png)
+
 ```
 Error: Could not load the "sharp" module using the linuxmusl-x64 runtime
 ```
