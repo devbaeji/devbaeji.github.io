@@ -1,0 +1,160 @@
+<style>
+  .sched-arch {
+    --sa-bg: #0b1220;
+    --sa-panel: #131c30;
+    --sa-panel-2: #1e293b;
+    --sa-text: #e2e8f0;
+    --sa-muted: #94a3b8;
+    --sa-ok: #22c55e;
+    --sa-bad: #ef4444;
+    --sa-accent: #38bdf8;
+    --sa-purple: #c084fc;
+    --sa-line: #334155;
+
+    background: linear-gradient(135deg, var(--sa-bg) 0%, #050a16 100%);
+    color: var(--sa-text);
+    padding: 28px 22px;
+    border-radius: 14px;
+    margin: 24px 0;
+    font-family: -apple-system, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    line-height: 1.55;
+  }
+  .sched-arch * { box-sizing: border-box; }
+  .sched-arch .sa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) {
+    .sched-arch .sa-grid { grid-template-columns: 1fr; }
+  }
+  .sched-arch .sa-panel {
+    background: var(--sa-panel);
+    border: 1.5px solid var(--sa-panel-2);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .sched-arch .sa-panel.before { border-color: rgba(239, 68, 68, 0.55); }
+  .sched-arch .sa-panel.after { border-color: rgba(34, 197, 94, 0.55); }
+  .sched-arch .sa-label {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+  .sched-arch .sa-label.bad { background: var(--sa-bad); color: white; }
+  .sched-arch .sa-label.ok { background: var(--sa-ok); color: #052e0e; }
+  .sched-arch .sa-h3 { font-size: 14px; margin: 4px 0 12px; color: var(--sa-accent); font-weight: 600; }
+  .sched-arch .sa-diagram {
+    background: #06101f;
+    border: 1px dashed var(--sa-line);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .sched-arch .sa-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 6px 0;
+  }
+  .sched-arch .sa-box {
+    background: var(--sa-panel-2);
+    border: 1.5px solid var(--sa-line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    text-align: center;
+    min-width: 110px;
+  }
+  .sched-arch .sa-box .ttl {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 3px;
+    font-family: inherit;
+  }
+  .sched-arch .sa-box small {
+    display: block;
+    color: var(--sa-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+  .sched-arch .sa-box.aws { background: linear-gradient(135deg, #1e3a5f, #142a45); border-color: var(--sa-accent); color: #bae6fd; }
+  .sched-arch .sa-box.sqs { background: linear-gradient(135deg, #4a2c5f, #341f44); border-color: var(--sa-purple); color: #f3d4ff; }
+  .sched-arch .sa-box.pod { background: linear-gradient(135deg, #1f3a2a, #122a1d); border-color: var(--sa-ok); color: #d1fae5; }
+  .sched-arch .sa-box.bad { background: linear-gradient(135deg, #4a1f1f, #2e1212); border-color: var(--sa-bad); color: #fecaca; }
+  .sched-arch .sa-box.muted { opacity: 0.45; }
+  .sched-arch .sa-arrow { text-align: center; color: var(--sa-muted); font-size: 18px; margin: 4px 0; }
+  .sched-arch .sa-caption { color: var(--sa-muted); font-size: 12px; margin-top: 10px; text-align: center; }
+</style>
+
+<div class="sched-arch">
+  <div class="sa-grid">
+    <!-- BEFORE -->
+    <div class="sa-panel before">
+      <span class="sa-label bad">BEFORE — Spring @Scheduled</span>
+      <div class="sa-h3">각 pod 안 JVM 타이머가 독립 실행</div>
+      <div class="sa-diagram">
+        <div class="sa-row">
+          <div class="sa-box bad">
+            <span class="ttl">Pod A</span>
+            <small>@Scheduled<br />매 10분</small>
+          </div>
+          <div class="sa-box bad">
+            <span class="ttl">Pod B</span>
+            <small>@Scheduled<br />매 10분</small>
+          </div>
+          <div class="sa-box bad">
+            <span class="ttl">Pod C</span>
+            <small>@Scheduled<br />매 10분</small>
+          </div>
+        </div>
+        <div class="sa-arrow">↓ ↓ ↓ (동시에)</div>
+        <div class="sa-row">
+          <div class="sa-box pod">
+            <span class="ttl">Service</span>
+            <small>실 도메인 로직<br />(N번 실행)</small>
+          </div>
+        </div>
+      </div>
+      <div class="sa-caption">N pod = N번 중복 실행 · 분산 락 없음</div>
+    </div>
+
+    <!-- AFTER -->
+    <div class="sa-panel after">
+      <span class="sa-label ok">AFTER — EventBridge → SQS</span>
+      <div class="sa-h3">AWS가 cron 보유, SQS lease로 1 pod만 처리</div>
+      <div class="sa-diagram">
+        <div class="sa-row">
+          <div class="sa-box aws">
+            <span class="ttl">EventBridge</span>
+            <small>rate(5 min)</small>
+          </div>
+        </div>
+        <div class="sa-arrow">↓</div>
+        <div class="sa-row">
+          <div class="sa-box sqs">
+            <span class="ttl">SQS</span>
+            <small>trigger-queue</small>
+          </div>
+        </div>
+        <div class="sa-arrow">↓ (1 pod만 lease)</div>
+        <div class="sa-row">
+          <div class="sa-box pod">
+            <span class="ttl">Pod A ✓</span>
+            <small>SqsConsumer<br />→ Service</small>
+          </div>
+          <div class="sa-box muted">
+            <span class="ttl">Pod B</span>
+            <small>polling 중<br />(못 봄)</small>
+          </div>
+          <div class="sa-box muted">
+            <span class="ttl">Pod C</span>
+            <small>polling 중<br />(못 봄)</small>
+          </div>
+        </div>
+      </div>
+      <div class="sa-caption">cron tick 당 호출 1회 · 인프라가 중복 차단</div>
+    </div>
+  </div>
+</div>

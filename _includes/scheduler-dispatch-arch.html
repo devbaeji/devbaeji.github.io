@@ -1,0 +1,153 @@
+<style>
+  .sched-dispatch {
+    --sd-bg: #0b1220;
+    --sd-panel: #131c30;
+    --sd-panel-2: #1e293b;
+    --sd-text: #e2e8f0;
+    --sd-muted: #94a3b8;
+    --sd-ok: #22c55e;
+    --sd-accent: #38bdf8;
+    --sd-purple: #c084fc;
+    --sd-orange: #fb923c;
+    --sd-pink: #f472b6;
+    --sd-line: #334155;
+
+    background: linear-gradient(135deg, var(--sd-bg) 0%, #050a16 100%);
+    color: var(--sd-text);
+    padding: 28px 22px;
+    border-radius: 14px;
+    margin: 24px 0;
+    font-family: -apple-system, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    line-height: 1.55;
+  }
+  .sched-dispatch * { box-sizing: border-box; }
+  .sched-dispatch .sd-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--sd-accent);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .sched-dispatch .sd-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 6px 0;
+  }
+  .sched-dispatch .sd-row.spread { justify-content: space-between; gap: 8px; }
+  .sched-dispatch .sd-box {
+    background: var(--sd-panel-2);
+    border: 1.5px solid var(--sd-line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    text-align: center;
+    min-width: 110px;
+    flex: 1 1 auto;
+  }
+  .sched-dispatch .sd-box .ttl {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 3px;
+    font-family: inherit;
+  }
+  .sched-dispatch .sd-box small {
+    display: block;
+    color: var(--sd-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+  .sched-dispatch .sd-box.api { background: linear-gradient(135deg, #1f3a2a, #122a1d); border-color: var(--sd-ok); color: #d1fae5; }
+  .sched-dispatch .sd-box.sqs { background: linear-gradient(135deg, #4a2c5f, #341f44); border-color: var(--sd-purple); color: #f3d4ff; }
+  .sched-dispatch .sd-box.lambda { background: linear-gradient(135deg, #5c3013, #3f200d); border-color: var(--sd-orange); color: #fed7aa; }
+  .sched-dispatch .sd-box.sns { background: linear-gradient(135deg, #6b1d3c, #4a132a); border-color: var(--sd-pink); color: #fce7f3; }
+  .sched-dispatch .sd-box.ext { background: linear-gradient(135deg, #2c3e50, #1a242e); border-color: #64748b; color: #cbd5e1; }
+  .sched-dispatch .sd-arrow {
+    text-align: center;
+    color: var(--sd-muted);
+    font-size: 18px;
+    margin: 4px 0;
+  }
+  .sched-dispatch .sd-arrow.note { font-size: 11px; font-style: italic; }
+  .sched-dispatch .sd-divider {
+    margin: 18px 0 12px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--sd-line);
+  }
+</style>
+
+<div class="sched-dispatch">
+  <div class="sd-title">알림 발송 파이프라인</div>
+
+  <!-- 1) API → SQS -->
+  <div class="sd-row">
+    <div class="sd-box api" style="max-width: 360px;">
+      <span class="ttl">Spring API</span>
+      <small>NotificationFacadeService<br />→ NotificationService<br />sqsTemplate.send(...)</small>
+    </div>
+  </div>
+  <div class="sd-arrow">↓</div>
+  <div class="sd-row">
+    <div class="sd-box sqs" style="max-width: 320px;">
+      <span class="ttl">SQS</span>
+      <small>notification-queue</small>
+    </div>
+  </div>
+  <div class="sd-arrow">↓</div>
+
+  <!-- 2) Router Lambda → SNS -->
+  <div class="sd-row">
+    <div class="sd-box lambda" style="max-width: 360px;">
+      <span class="ttl">notification-router (Lambda)</span>
+      <small>message.types 별로 SNS Topic 분기</small>
+    </div>
+  </div>
+  <div class="sd-arrow">↓ fanout (PublishCommand)</div>
+
+  <!-- 3) SNS Topics ×5 -->
+  <div class="sd-row spread">
+    <div class="sd-box sns"><span class="ttl">SNS</span><small>gmail</small></div>
+    <div class="sd-box sns"><span class="ttl">SNS</span><small>fcm</small></div>
+    <div class="sd-box sns"><span class="ttl">SNS</span><small>slack</small></div>
+    <div class="sd-box sns"><span class="ttl">SNS</span><small>kakao</small></div>
+    <div class="sd-box sns"><span class="ttl">SNS</span><small>sms</small></div>
+  </div>
+  <div class="sd-arrow">↓</div>
+
+  <!-- 4) Channel Lambdas -->
+  <div class="sd-row spread">
+    <div class="sd-box lambda"><span class="ttl">gmail-notifier</span><small>SES / SMTP</small></div>
+    <div class="sd-box lambda"><span class="ttl">fcm-notifier</span><small>firebase-admin</small></div>
+    <div class="sd-box lambda"><span class="ttl">slack-notifier</span><small>Webhook</small></div>
+    <div class="sd-box lambda"><span class="ttl">kakao-notifier</span><small>알림톡 API</small></div>
+    <div class="sd-box lambda"><span class="ttl">sms-notifier</span><small>SMS API</small></div>
+  </div>
+  <div class="sd-arrow">↓</div>
+
+  <!-- 5) External services -->
+  <div class="sd-row spread">
+    <div class="sd-box ext"><small>📧<br />Gmail</small></div>
+    <div class="sd-box ext"><small>📱<br />FCM</small></div>
+    <div class="sd-box ext"><small>💬<br />Slack</small></div>
+    <div class="sd-box ext"><small>💛<br />Kakao</small></div>
+    <div class="sd-box ext"><small>📨<br />SMS</small></div>
+  </div>
+
+  <!-- 6) Result loop -->
+  <div class="sd-divider">
+    <div class="sd-row">
+      <div class="sd-box sqs">
+        <span class="ttl">결과 SQS</span>
+        <small>notification-result</small>
+      </div>
+      <div class="sd-box api">
+        <span class="ttl">result-listener</span>
+        <small>DB 기록<br />(UserNotification)</small>
+      </div>
+    </div>
+    <div class="sd-arrow note">발송 성공/실패 결과를 다시 SQS 로 수집 → DB 저장</div>
+  </div>
+</div>

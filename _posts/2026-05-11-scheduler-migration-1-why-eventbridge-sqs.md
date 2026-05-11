@@ -63,18 +63,7 @@ fun preCreateAttendances() { ... }
 
 AWS **EventBridge Scheduler** 가 cron 시계 역할. 시간 되면 메시지 1건을 SQS 큐에 enqueue. Spring Consumer 가 받아서 처리.
 
-```
-[EventBridge Scheduler]       ← AWS 매니지드 cron
-        │  매 N분마다 메시지 1건
-        ▼
-[SQS Queue]
-        │
-   [Pod A] [Pod B] [Pod C]    ← 모든 pod 이 polling
-        │
-        └─ SQS 가 한 메시지를 "딱 한 pod" 한테만 lease
-            처리 완료 → DeleteMessage
-            처리 실패 → visibility timeout 후 재시도
-```
+{% include scheduler-trigger-arch.html %}
 
 핵심: **SQS 의 "1 메시지 = 1 consumer lease"** 모델. pod 이 100개여도 한 메시지는 1개 pod 만 처리. 분산 락 코드 없이 인프라 레벨에서 보장.
 
@@ -154,36 +143,7 @@ fun onMessage(message: BatchTriggerMessage) {
 
 운영에서 확인한 발송 레이어 아키텍처:
 
-```
-[Spring API]
-  NotificationFacadeService → NotificationService
-  sqsTemplate.send(notification-queue, payload)
-        │
-        ▼
-[SQS notification-queue]
-        │
-        ▼
-[Lambda: notification-router]
-  message.types 배열 보고 SNS Topic 으로 분기 (fanout)
-        │
-        ├──────┬──────┬──────┬──────┬──────┐
-        ▼      ▼      ▼      ▼      ▼
-   [SNS]  [SNS]  [SNS]  [SNS]  [SNS]
-   gmail   fcm   slack  kakao   sms
-     │      │      │      │      │
-     ▼      ▼      ▼      ▼      ▼
-  [gmail- [fcm-  [slack-[kakao-[sms-
-   notifier]notifier]notifier]notifier]notifier]
-   Lambda  Lambda  Lambda Lambda Lambda
-     │      │      │      │      │
-     ▼      ▼      ▼      ▼      ▼
-   📧     📱     💬     💛     📨
-   Gmail  FCM    Slack  Kakao  SMS
-
-------------------------------------------
-발송 결과 SQS → [Spring result-listener] → DB 기록
-                                          (UserNotification 등)
-```
+{% include scheduler-dispatch-arch.html %}
 
 레이어별 책임:
 
