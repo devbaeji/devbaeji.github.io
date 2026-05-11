@@ -148,6 +148,75 @@ fun onMessage(message: BatchTriggerMessage) {
 > 3. **부하 분산** — 한 메시지를 여러 pod 중 한 곳이 가져감. 직접 호출은 특정 인스턴스에 고정.
 > 4. **느슨한 결합** — EventBridge 는 SQS 큐 이름만 알면 됨. Consumer 가 어떤 언어/플랫폼인지 무관.
 
+## 그 뒤 — 발송 레이어 (Lambda + SNS fanout)
+
+여기까지가 *"언제 알림 로직을 돌릴지"* 의 트리거 레이어. 트리거된 도메인 로직이 *"누구에게 무엇을 보낼지"* 결정한 다음, 실제 외부 채널(Gmail, FCM, Slack, Kakao 등) 로 발송하는 건 또 다른 파이프라인이다.
+
+운영에서 확인한 발송 레이어 아키텍처:
+
+```
+[Spring API]
+  NotificationFacadeService → NotificationService
+  sqsTemplate.send(notification-queue, payload)
+        │
+        ▼
+[SQS notification-queue]
+        │
+        ▼
+[Lambda: notification-router]
+  message.types 배열 보고 SNS Topic 으로 분기 (fanout)
+        │
+        ├──────┬──────┬──────┬──────┬──────┐
+        ▼      ▼      ▼      ▼      ▼
+   [SNS]  [SNS]  [SNS]  [SNS]  [SNS]
+   gmail   fcm   slack  kakao   sms
+     │      │      │      │      │
+     ▼      ▼      ▼      ▼      ▼
+  [gmail- [fcm-  [slack-[kakao-[sms-
+   notifier]notifier]notifier]notifier]notifier]
+   Lambda  Lambda  Lambda Lambda Lambda
+     │      │      │      │      │
+     ▼      ▼      ▼      ▼      ▼
+   📧     📱     💬     💛     📨
+   Gmail  FCM    Slack  Kakao  SMS
+
+------------------------------------------
+발송 결과 SQS → [Spring result-listener] → DB 기록
+                                          (UserNotification 등)
+```
+
+레이어별 책임:
+
+| 레이어 | 역할 | 구현체 |
+|---|---|---|
+| Spring API | 알림 도메인 로직 (누구한테/무엇을) | `NotificationFacadeService` |
+| SQS | 비동기 큐 | `notification-queue` |
+| Router Lambda | 메시지 타입별 SNS 분기 | `notification-router` |
+| SNS Topic ×5 | 채널별 토픽 (fanout) | gmail / fcm / slack / kakao / sms |
+| Channel Lambda ×5 | 실제 외부 API 호출 | `*-notifier` |
+| 외부 서비스 | Firebase / Gmail / Slack / Kakao / SMS provider | — |
+| 결과 수집 | 발송 결과 DB 기록 | `result-listener` |
+
+> **면접 질문 💼**
+> *"왜 Lambda 가 하나로 모든 채널을 발송하지 않고 SNS Topic 으로 fanout 하나요?"*
+>
+> 1. **채널별 독립 스케일링** — FCM 은 트래픽 많고 Slack 은 적다면, 각 Lambda 의 동시성 설정을 따로 튜닝 가능.
+> 2. **장애 격리** — Gmail Lambda 가 죽어도 다른 채널은 정상 발송. 단일 Lambda 였으면 한 채널 실패가 전체 재시도로 번짐.
+> 3. **권한 분리** — fcm-notifier 만 Firebase Secrets Manager 권한, gmail-notifier 만 SES 권한. 최소 권한 원칙 적용.
+> 4. **다른 구독자 추가 용이** — SNS Topic 에 새 구독자 (예: 분석용 Lambda, CloudWatch Logs) 추가가 자유로움.
+>
+> SNS 의 핵심은 **publish-subscribe** 모델. 발행자(Router) 는 구독자가 누구인지 몰라도 됨.
+
+> **면접 질문 💼**
+> *"at-least-once delivery 가 멀티 레이어에서 어떻게 누적되나요?"*
+>
+> 이 파이프라인엔 SQS → Lambda → SNS → Lambda 까지 메시지가 4번 단계를 거친다. 각 단계가 at-least-once 라면 최악의 경우 **같은 푸시가 여러 번 발송될 수 있다**.
+>
+> 방어:
+> - SQS 의 visibility timeout 적절히 설정 (Lambda 처리 시간보다 길게)
+> - 발송 결과 DB 기록 시 idempotency key (메시지 ID 등) 로 중복 차단
+> - 정 안 되면 SQS FIFO + 중복 제거 window 사용
+
 ## Visibility Timeout
 
 > **면접 질문 💼**
