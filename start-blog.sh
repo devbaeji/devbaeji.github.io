@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "==================================="
-echo "Starting Jekyll Blog on port 4000"
+echo "Starting Jekyll Blog on port 4001"
 echo "==================================="
 
 # Check if bundle is installed
@@ -15,6 +15,6 @@ fi
 echo "Checking dependencies..."
 bundle install
 
-# Start Jekyll server on port 4000
-echo "Starting server at http://localhost:4000"
-bundle exec jekyll serve --port 4000
+# Start Jekyll server on port 4001
+echo "Starting server at http://localhost:4001"
+bundle exec jekyll serve --port 4001 --future
