@@ -1,0 +1,149 @@
+<style>
+  .sched-integrated {
+    --si-bg: #0b1220;
+    --si-panel: #131c30;
+    --si-panel-2: #1e293b;
+    --si-text: #e2e8f0;
+    --si-muted: #94a3b8;
+    --si-ok: #22c55e;
+    --si-accent: #38bdf8;
+    --si-purple: #c084fc;
+    --si-orange: #fb923c;
+    --si-pink: #f472b6;
+    --si-line: #334155;
+
+    background: linear-gradient(135deg, var(--si-bg) 0%, #050a16 100%);
+    color: var(--si-text);
+    padding: 28px 22px;
+    border-radius: 14px;
+    margin: 24px 0;
+    font-family: -apple-system, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    line-height: 1.55;
+  }
+  .sched-integrated * { box-sizing: border-box; }
+  .sched-integrated .si-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--si-accent);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .sched-integrated .si-section-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--si-accent);
+    margin: 0 0 12px;
+  }
+  .sched-integrated .si-note {
+    color: var(--si-muted);
+    font-size: 12.5px;
+    margin: 0 0 12px;
+  }
+  .sched-integrated .si-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin: 6px 0;
+  }
+  .sched-integrated .si-row.spaced { gap: 32px; }
+  .sched-integrated .si-box {
+    background: var(--si-panel-2);
+    border: 1.5px solid var(--si-line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    text-align: center;
+    min-width: 130px;
+  }
+  .sched-integrated .si-box .ttl {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 3px;
+    font-family: inherit;
+  }
+  .sched-integrated .si-box small {
+    display: block;
+    color: var(--si-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+  .sched-integrated .si-box.aws { background: linear-gradient(135deg, #1e3a5f, #142a45); border-color: var(--si-accent); color: #bae6fd; }
+  .sched-integrated .si-box.sqs { background: linear-gradient(135deg, #4a2c5f, #341f44); border-color: var(--si-purple); color: #f3d4ff; }
+  .sched-integrated .si-box.api { background: linear-gradient(135deg, #1f3a2a, #122a1d); border-color: var(--si-ok); color: #d1fae5; }
+  .sched-integrated .si-box.lambda { background: linear-gradient(135deg, #5c3013, #3f200d); border-color: var(--si-orange); color: #fed7aa; }
+  .sched-integrated .si-box.sns { background: linear-gradient(135deg, #6b1d3c, #4a132a); border-color: var(--si-pink); color: #fce7f3; }
+  .sched-integrated .si-box.ext { background: linear-gradient(135deg, #2c3e50, #1a242e); border-color: #64748b; color: #cbd5e1; }
+  .sched-integrated .si-arrow {
+    text-align: center;
+    color: var(--si-muted);
+    font-size: 18px;
+    margin: 4px 0;
+  }
+  .sched-integrated .si-arrow.h { font-size: 16px; margin: 0 4px; }
+  .sched-integrated .si-arrow.note { font-size: 11px; font-style: italic; }
+  .sched-integrated .si-divider {
+    margin: 24px 0;
+    border-top: 1px dashed var(--si-line);
+  }
+</style>
+
+<div class="sched-integrated">
+  <div class="si-title">트리거 + 발송 — 통합 아키텍처</div>
+
+  <!-- ============== ① 트리거 (언제) ============== -->
+  <div class="si-section-label">① 트리거 (언제 실행할지)</div>
+  <div class="si-row">
+    <div class="si-box aws" style="max-width: 360px;">
+      <span class="ttl">EventBridge Scheduler ×2</span>
+      <small>notification-scheduler / attendance-scheduler<br />rate(5 minutes)</small>
+    </div>
+  </div>
+  <div class="si-arrow">↓</div>
+  <div class="si-row spaced">
+    <div class="si-box sqs">
+      <span class="ttl">SQS</span>
+      <small>notification-trigger</small>
+    </div>
+    <div class="si-box sqs">
+      <span class="ttl">SQS</span>
+      <small>attendance-trigger</small>
+    </div>
+  </div>
+  <div class="si-arrow note">↓ 1 pod 만 lease</div>
+  <div class="si-row spaced">
+    <div class="si-box api" style="max-width: 280px;">
+      <span class="ttl">NotificationTriggerSqsConsumer</span>
+      <small>→ ScheduledNotificationService<br />(5종 reminder 묶음)</small>
+    </div>
+    <div class="si-box api" style="max-width: 280px;">
+      <span class="ttl">AttendanceTriggerSqsConsumer</span>
+      <small>→ AttendancePreCreationService</small>
+    </div>
+  </div>
+
+  <div class="si-divider"></div>
+
+  <!-- ============== ② 발송 (어떻게) ============== -->
+  <div class="si-section-label">② 발송 (어떻게 외부로 전달할지)</div>
+  <div class="si-note">
+    ① 의 도메인 서비스가 <em>"누구에게 무엇을 보낼지"</em> 결정한 다음
+    <code>NotificationService.sqsTemplate.send()</code> 호출.
+  </div>
+  <div class="si-row">
+    <div class="si-box api"><span class="ttl">Spring API</span><small>NotificationService</small></div>
+    <div class="si-arrow h">→</div>
+    <div class="si-box sqs"><span class="ttl">SQS</span><small>notification-queue</small></div>
+    <div class="si-arrow h">→</div>
+    <div class="si-box lambda"><span class="ttl">Lambda</span><small>notification-router</small></div>
+    <div class="si-arrow h">fanout</div>
+    <div class="si-box sns"><span class="ttl">SNS ×5</span><small>gmail/fcm/slack/<br />kakao/sms</small></div>
+    <div class="si-arrow h">→</div>
+    <div class="si-box lambda"><span class="ttl">Channel Lambda ×5</span><small>*-notifier</small></div>
+    <div class="si-arrow h">→</div>
+    <div class="si-box ext"><span class="ttl">외부 채널</span><small>📧 📱 💬 💛 📨</small></div>
+  </div>
+</div>
