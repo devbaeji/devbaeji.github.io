@@ -15,6 +15,10 @@ tags: [spring, refactoring, dead-code, sqs, eventbridge, migration, over-enginee
 1. **마이그레이션 잔재를 발견한 과정** (가설 → 동료 정정 → 재의심)
 2. **청소 작업을 over-engineering 했다가 simple 로 돌아간 과정** (5 커밋 → 1 커밋)
 
+전제: 운영이 의도한 트리거 구조는 *오른쪽 (After)* 인데, 실제로는 *왼쪽 (Before)* + *오른쪽 (After)* 가 **동시에** 살아있었다. 1편 의 시각화를 다시 가져오면:
+
+{% include scheduler-trigger-arch.html %}
+
 ## 1차 가설 (틀림)
 
 코드 리뷰 중 *"부하/race condition 처리는 어떻게 돼 있나"* 하고 도메인을 훑었다. 출퇴근/알림 쪽에 `@Scheduled` 가 많이 보였고 가설이 떠올랐다:
