@@ -1,0 +1,64 @@
+<style>
+  .cif {
+    --bg: #0b1220; --panel: #131c30; --panel2: #1e293b; --text: #e2e8f0;
+    --muted: #94a3b8; --ok: #22c55e; --accent: #38bdf8; --line: #334155;
+    background: linear-gradient(135deg, var(--bg) 0%, #050a16 100%);
+    color: var(--text); padding: 28px 22px; border-radius: 14px; margin: 24px 0;
+    font-family: -apple-system, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    line-height: 1.55;
+  }
+  .cif * { box-sizing: border-box; }
+  .cif .flow { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; justify-content: center; }
+  .cif .node {
+    flex: 1; min-width: 150px; background: var(--panel2); border: 1.5px solid var(--line);
+    border-radius: 9px; padding: 12px; text-align: center; font-size: 12px;
+  }
+  .cif .node .ttl { font-weight: 700; display: block; margin-bottom: 5px; }
+  .cif .node small { display: block; color: var(--muted); font-size: 10.5px; font-family: "SF Mono", Menlo, monospace; line-height: 1.5; }
+  .cif .node.broker { background: linear-gradient(135deg, #1e3a5f, #142a45); border-color: #2563eb; color: #bae6fd; }
+  .cif .node.broker .ttl { color: #fff; }
+  .cif .node.svc { border-color: rgba(34, 197, 94, 0.55); }
+  .cif .conn { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 6px; min-width: 56px; }
+  .cif .conn .a { font-size: 20px; color: var(--accent); line-height: 1; }
+  .cif .conn small { color: var(--muted); font-size: 9.5px; margin-top: 3px; white-space: nowrap; }
+  @media (max-width: 720px) {
+    .cif .flow { flex-direction: column; align-items: stretch; }
+    .cif .conn { flex-direction: row; min-width: auto; padding: 4px 0; gap: 6px; }
+    .cif .conn .a { transform: rotate(90deg); }
+  }
+  .cif .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  @media (max-width: 720px) { .cif .meta { grid-template-columns: 1fr; } }
+  .cif .meta .m { background: var(--panel); border-radius: 8px; padding: 11px 13px; font-size: 11.5px; }
+  .cif .meta .m b { color: var(--accent); display: block; margin-bottom: 4px; }
+  .cif .caption { color: var(--muted); font-size: 12px; margin-top: 14px; text-align: center; }
+</style>
+
+<div class="cif">
+  <div class="flow">
+    <div class="node">
+      <span class="ttl">프론트</span>
+      <small>@stomp/stompjs<br />client.subscribe()</small>
+    </div>
+    <div class="conn"><span class="a">→</span><small>STOMP / WS</small></div>
+    <div class="node">
+      <span class="ttl">Spring WebSocket</span>
+      <small>/api/ws/chat<br />CONNECT 인증</small>
+    </div>
+    <div class="conn"><span class="a">→</span><small>STOMP relay</small></div>
+    <div class="node broker">
+      <span class="ttl">ActiveMQ Artemis</span>
+      <small>:61613<br />topic fan-out</small>
+    </div>
+    <div class="conn"><span class="a">←</span><small>publish</small></div>
+    <div class="node svc">
+      <span class="ttl">ChatMessageService</span>
+      <small>messagingTemplate<br />.convertAndSend()</small>
+    </div>
+  </div>
+
+  <div class="meta">
+    <div class="m"><b>프로토콜</b>WebSocket 위에 STOMP(텍스트 기반). SUBSCRIBE / MESSAGE / UNSUBSCRIBE frame 으로 통신해 DevTools 로 그대로 읽힌다.</div>
+    <div class="m"><b>환경 분기</b>로컬·CI 는 Spring 내장 SimpleBroker(인메모리), 운영은 enableStompBrokerRelay 로 ActiveMQ 위임. 프론트 코드는 동일.</div>
+  </div>
+  <div class="caption">구독(FE→broker)과 발행(Service→broker)이 broker 를 가운데 두고 만난다.</div>
+</div>

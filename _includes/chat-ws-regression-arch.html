@@ -1,0 +1,79 @@
+<style>
+  .cwr {
+    --bg: #0b1220; --panel: #131c30; --panel2: #1e293b; --text: #e2e8f0;
+    --muted: #94a3b8; --ok: #22c55e; --bad: #ef4444; --accent: #38bdf8; --line: #334155;
+    background: linear-gradient(135deg, var(--bg) 0%, #050a16 100%);
+    color: var(--text); padding: 28px 22px; border-radius: 14px; margin: 24px 0;
+    font-family: -apple-system, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    line-height: 1.55;
+  }
+  .cwr * { box-sizing: border-box; }
+  .cwr .pub {
+    background: linear-gradient(135deg, #1e3a5f, #142a45); border: 1.5px solid var(--accent);
+    color: #bae6fd; border-radius: 10px; padding: 12px 14px; text-align: center;
+    max-width: 440px; margin: 0 auto; font-family: "SF Mono", Menlo, monospace; font-size: 12px;
+  }
+  .cwr .pub .ttl { font-weight: 700; margin-bottom: 4px; display: block; color: #e0f2fe; }
+  .cwr .fork { text-align: center; color: var(--muted); font-size: 16px; margin: 8px 0 12px; }
+  .cwr .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .cwr .grid { grid-template-columns: 1fr; } }
+  .cwr .panel { background: var(--panel); border: 1.5px solid var(--panel2); border-radius: 12px; padding: 18px; }
+  .cwr .panel.ok { border-color: rgba(34, 197, 94, 0.55); }
+  .cwr .panel.bad { border-color: rgba(239, 68, 68, 0.55); }
+  .cwr .lbl { display: inline-block; padding: 3px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 10px; letter-spacing: 0.3px; }
+  .cwr .lbl.ok { background: var(--ok); color: #052e0e; }
+  .cwr .lbl.bad { background: var(--bad); color: #fff; }
+  .cwr .h3 { font-size: 13px; margin: 4px 0 12px; color: var(--accent); font-weight: 600; }
+  .cwr .box { background: var(--panel2); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px; font-family: "SF Mono", Menlo, monospace; font-size: 12px; text-align: center; }
+  .cwr .box .ttl { display: block; font-weight: 700; margin-bottom: 3px; }
+  .cwr .box small { display: block; color: var(--muted); font-size: 10.5px; line-height: 1.4; font-family: inherit; }
+  .cwr .box.topic-ok { background: linear-gradient(135deg, #1f3a2a, #122a1d); border-color: var(--ok); color: #d1fae5; }
+  .cwr .box.topic-bad { background: linear-gradient(135deg, #4a1f1f, #2e1212); border-color: var(--bad); color: #fecaca; }
+  .cwr .arrow { text-align: center; color: var(--muted); font-size: 15px; margin: 7px 0; }
+  .cwr .match { text-align: center; font-size: 11.5px; font-weight: 700; margin-top: 10px; }
+  .cwr .match.ok { color: var(--ok); }
+  .cwr .match.bad { color: var(--bad); }
+  .cwr .caption { color: var(--muted); font-size: 12px; margin-top: 16px; text-align: center; }
+</style>
+
+<div class="cwr">
+  <div class="pub">
+    <span class="ttl">백엔드 publish — BEFORE · AFTER 동일</span>
+    /topic/workspace.<b>14</b>.chat-notify
+  </div>
+  <div class="fork">▼ &nbsp; 같은 발행을 두 화면이 다르게 구독한다 &nbsp; ▼</div>
+
+  <div class="grid">
+    <div class="panel ok">
+      <span class="lbl ok">BEFORE — 워크스페이스 페이지</span>
+      <div class="h3">URL 이 workspaceId 를 보장</div>
+      <div class="box">
+        <span class="ttl">/workspaces/14/chat</span>
+        <small>workspaceId = 14 (URL params)</small>
+      </div>
+      <div class="arrow">↓ subscribe</div>
+      <div class="box topic-ok">
+        <span class="ttl">/topic/workspace.<b>14</b>.chat-notify</span>
+        <small>publish 토픽과 정확히 일치</small>
+      </div>
+      <div class="match ok">✅ 콜백 발화 → 목록·배지 실시간 갱신</div>
+    </div>
+
+    <div class="panel bad">
+      <span class="lbl bad">AFTER — cross-workspace 드로어</span>
+      <div class="h3">URL 이 없어 컨텍스트 소실</div>
+      <div class="box">
+        <span class="ttl">드로어 (URL 무관)</span>
+        <small>activeWorkspaceId = 0 (선택 전 초기값)</small>
+      </div>
+      <div class="arrow">↓ subscribe</div>
+      <div class="box topic-bad">
+        <span class="ttl">/topic/workspace.<b>0</b>.chat-notify</span>
+        <small>아무도 publish 안 하는 죽은 토픽</small>
+      </div>
+      <div class="match bad">❌ 구독자 없음 → 무반응 · 에러조차 없음</div>
+    </div>
+  </div>
+
+  <div class="caption">백엔드 발행은 그대로, 프론트 구독 토픽만 <b>14 → 0</b> 으로 어긋난 것이 회귀의 전부다.</div>
+</div>

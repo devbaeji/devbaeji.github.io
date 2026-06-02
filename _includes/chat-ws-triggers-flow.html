@@ -1,0 +1,62 @@
+<style>
+  .ctf {
+    --bg: #0b1220; --panel: #131c30; --panel2: #1e293b; --text: #e2e8f0;
+    --muted: #94a3b8; --ok: #22c55e; --warn: #f59e0b; --accent: #38bdf8; --line: #334155;
+    background: linear-gradient(135deg, var(--bg) 0%, #050a16 100%);
+    color: var(--text); padding: 28px 22px; border-radius: 14px; margin: 24px 0;
+    font-family: -apple-system, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    line-height: 1.55;
+  }
+  .ctf * { box-sizing: border-box; }
+  .ctf .trigs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 720px) { .ctf .trigs { grid-template-columns: 1fr; } }
+  .ctf .box { background: var(--panel2); border: 1.5px solid var(--line); border-radius: 9px; padding: 12px; text-align: center; font-size: 12px; }
+  .ctf .box .ttl { display: block; font-weight: 700; margin-bottom: 4px; }
+  .ctf .box small { display: block; color: var(--muted); font-size: 10.5px; line-height: 1.45; }
+  .ctf .trig { background: linear-gradient(135deg, #3b2f0b, #2a2208); border-color: rgba(245, 158, 11, 0.6); color: #fde68a; }
+  .ctf .trig.safe { border-style: dashed; }
+  .ctf .arrow { text-align: center; color: var(--muted); font-size: 16px; margin: 8px 0; }
+  .ctf .center { max-width: 460px; margin: 0 auto; }
+  .ctf .merge { background: #0c2233; border: 1.5px solid var(--accent); color: #bae6fd; }
+  .ctf .rest { background: linear-gradient(135deg, #1f3a2a, #122a1d); border-color: var(--ok); color: #d1fae5; }
+  .ctf .ui { background: var(--panel); border-color: var(--line); }
+  .ctf .skip { text-align: center; color: var(--warn); font-size: 10.5px; margin-top: 6px; }
+  .ctf .caption { color: var(--muted); font-size: 12px; margin-top: 16px; text-align: center; }
+</style>
+
+<div class="ctf">
+  <div class="trigs">
+    <div class="box trig">
+      <span class="ttl">A · WebSocket 콜백</span>
+      <small>메시지 도착 즉시 (1차)</small>
+    </div>
+    <div class="box trig safe">
+      <span class="ttl">B · refetchInterval</span>
+      <small>30초 주기 안전망</small>
+    </div>
+    <div class="box trig">
+      <span class="ttl">C · mutation 성공</span>
+      <small>생성 · markAsRead · 전송</small>
+    </div>
+  </div>
+
+  <div class="arrow">↓ &nbsp; A · C 는 invalidate 경유, B 는 곧장 refetch &nbsp; ↓</div>
+
+  <div class="center">
+    <div class="box merge">
+      <span class="ttl">React Query invalidate</span>
+      <small>chatKeys.adminRoomsAll · adminUnreadCount</small>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="box rest">
+      <span class="ttl">REST refetch (서버 진실값)</span>
+      <small>GET /chats · GET /chats/unread-count</small>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="box ui">
+      <span class="ttl">채팅방 목록 · 미읽 배지 갱신</span>
+    </div>
+  </div>
+
+  <div class="caption">WebSocket payload 는 "어디서 뭔가 일어났다" 시그널일 뿐, 화면 데이터는 항상 REST 로 다시 받는다.</div>
+</div>
