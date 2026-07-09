@@ -72,7 +72,7 @@ functions:
     handler: src/index.handler
     events:
       - sns:
-          arn: arn:aws:sns:ap-northeast-2:225179063068:fcm-notifications-dev
+          arn: arn:aws:sns:ap-northeast-2:000000000000:fcm-notifications-dev
 ```
 
 그런데 이 `fcm-notifications-dev` Topic은 어디서 생성될까요? `notification-router`의 CloudFormation 리소스에서 생성됩니다:

@@ -87,7 +87,7 @@ fun workspaceChatNotify(workspaceId: Long): String =
 
 ```
                        발행 (JMS, pubSubDomain=true)
-                       VirtualTopic.spation.activity.events
+                       VirtualTopic.myapp.activity.events
                                   │  브로커가 그룹별 큐로 복제
         ┌─────────────────────────┼─────────────────────────┐
         ▼                         ▼                         ▼
@@ -217,10 +217,10 @@ VirtualTopic의 `Consumer.*` 큐는 콘솔에서 수동으로 만들 필요가 �
 
 ```kotlin
 // ActivityDebugListener.kt
-private const val QUEUE = "Consumer.qa.VirtualTopic.spation.activity.events1"
+private const val QUEUE = "Consumer.qa.VirtualTopic.myapp.activity.events1"
 ```
 
-이 리스너가 뜨면 `Consumer.qa.VirtualTopic.spation.activity.events1` 큐가 브로커에 생긴다. 반대로 앱이 죽어 있으면(=아무도 구독 안 하면) 콘솔에 큐가 **안 보이는 것도 정상**이다. "큐가 없다"가 아니라 "아직 아무도 구독을 안 했다"는 뜻이다. 이걸 모르면 "왜 콘솔에 큐가 없지?" 하고 한참 헤맨다.
+이 리스너가 뜨면 `Consumer.qa.VirtualTopic.myapp.activity.events1` 큐가 브로커에 생긴다. 반대로 앱이 죽어 있으면(=아무도 구독 안 하면) 콘솔에 큐가 **안 보이는 것도 정상**이다. "큐가 없다"가 아니라 "아직 아무도 구독을 안 했다"는 뜻이다. 이걸 모르면 "왜 콘솔에 큐가 없지?" 하고 한참 헤맨다.
 
 ## 7. 콘솔에서 보는 법 — 어느 탭에서 뭐가 보이나
 

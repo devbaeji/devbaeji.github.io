@@ -39,7 +39,7 @@ spec:
   template:
     spec:
       containers:
-        - image: ecr/.../spation-workspace-web:latest
+        - image: ecr/.../my-workspace-web:latest
 ```
 
 - `replicas: 3` — Pod 3개를 항상 유지. 하나 죽으면 자동 재시작
@@ -60,9 +60,9 @@ Pod 1개면 재시작 중 요청을 받을 수 없다. 2개면 하나 죽어도 
 AWS ap-northeast-2(서울)는 AZ가 3개다. Node를 AZ마다 배치하면 Pod 3개가 각 AZ에 1개씩 분산된다. AZ 하나가 장애여도 2개가 살아있다.
 
 ```
-AZ-a: spation-workspace-web-xxx-qs7sg
-AZ-b: spation-workspace-web-xxx-tpnfz
-AZ-c: spation-workspace-web-xxx-tzc5d
+AZ-a: my-workspace-web-xxx-qs7sg
+AZ-b: my-workspace-web-xxx-tpnfz
+AZ-c: my-workspace-web-xxx-tzc5d
 ```
 
 개발 환경은 replica 1~2개로 비용을 줄이고, 운영은 3개를 최소로 유지하는 이유다.

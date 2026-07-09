@@ -30,7 +30,7 @@ argocd-apps 레포 YAML 수정 & push
 → 클러스터 상태 업데이트
 ```
 
-우리 프로젝트는 `ksd-eks`(개발)에 ArgoCD가 설치되어 있고, `ksd-prod-eks`(운영)도 연결되어 있어서 UI에서 dev/prod 앱을 한 곳에서 관리한다.
+우리 프로젝트는 `dev-eks`(개발)에 ArgoCD가 설치되어 있고, `prod-eks`(운영)도 연결되어 있어서 UI에서 dev/prod 앱을 한 곳에서 관리한다.
 
 ## REFRESH vs SYNC
 

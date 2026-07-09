@@ -151,7 +151,7 @@ Turbopack을 유지하면서 artifact 업로드 문제를 해결하는 방법입
   run: |
     tar -czf build-output.tar.gz \
       openapi-specs/openapi-spec-base.json \
-      packages/ksd-app-commons/src/openapi/base/generated \
+      packages/app-commons/src/openapi/base/generated \
       apps/admin/.next \
       apps/admin/next.config.ts \
       apps/admin/package.json \

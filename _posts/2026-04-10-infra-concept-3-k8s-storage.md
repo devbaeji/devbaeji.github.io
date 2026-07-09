@@ -54,8 +54,8 @@ replica 3개 Deployment는 pod 3개가 서로 다른 Node에 배치될 수 있�
 kprod -n production get pvc
 
 NAME                                 STATUS  CAPACITY  ACCESS MODES  STORAGECLASS
-spation-workspace-web-image-cache    Bound   5Gi       RWX           efs-sc-nextjs
-spation-workspace-worker-image-cache Bound   5Gi       RWX           efs-sc-nextjs
+my-workspace-web-image-cache    Bound   5Gi       RWX           efs-sc-nextjs
+my-workspace-worker-image-cache Bound   5Gi       RWX           efs-sc-nextjs
 ```
 
 web/worker 각각 PVC를 분리했다. 하나로 공유할 수도 있지만, 앱 독립성과 장애 격리를 위해 분리하는 게 맞다.

@@ -247,7 +247,7 @@ functions:
     handler: src/index.handler
     events:
       - sqs:
-          arn: arn:aws:sqs:${self:provider.region}:${self:custom.accountId}:ksd-notification-mytest-workspace-${self:provider.stage}
+          arn: arn:aws:sqs:${self:provider.region}:${self:custom.accountId}:notification-mytest-workspace-${self:provider.stage}
           batchSize: 10
           maximumBatchingWindow: 5
           functionResponseType: ReportBatchItemFailures

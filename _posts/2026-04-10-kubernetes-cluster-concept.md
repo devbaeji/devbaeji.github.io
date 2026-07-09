@@ -26,7 +26,7 @@ AWS EKS를 쓰면 Control Plane은 AWS가 관리한다. Node(EC2)만 신경 쓰�
 
 ## dev/prod를 클러스터로 분리하는 이유
 
-같은 클러스터 안에서 네임스페이스(`-n develop`, `-n production`)로 나누는 방법도 있다. 근데 우리 프로젝트는 클러스터 자체를 분리(`ksd-eks`, `ksd-prod-eks`)해놨다.
+같은 클러스터 안에서 네임스페이스(`-n develop`, `-n production`)로 나누는 방법도 있다. 근데 우리 프로젝트는 클러스터 자체를 분리(`dev-eks`, `prod-eks`)해놨다.
 
 이유는 단순하다.
 
@@ -37,12 +37,12 @@ AWS EKS를 쓰면 Control Plane은 AWS가 관리한다. Node(EC2)만 신경 쓰�
 
 ## ArgoCD가 두 클러스터를 한 곳에서 관리
 
-ArgoCD 자체는 `ksd-eks`에 설치되어 있는데, `ksd-prod-eks`도 연결해놔서 UI에서 둘 다 보인다.
+ArgoCD 자체는 `dev-eks`에 설치되어 있는데, `prod-eks`도 연결해놔서 UI에서 둘 다 보인다.
 
 ```
 ArgoCD
-├── ksd-eks      → develop 앱 관리
-└── ksd-prod-eks → production 앱 관리
+├── dev-eks      → develop 앱 관리
+└── prod-eks → production 앱 관리
 ```
 
 ## 운영 클러스터 접속
@@ -51,12 +51,12 @@ ArgoCD
 
 ```bash
 # 운영 kubeconfig를 별도 파일에 저장
-aws eks update-kubeconfig --name ksd-prod-eks --region ap-northeast-2 \
+aws eks update-kubeconfig --name prod-eks --region ap-northeast-2 \
   --kubeconfig ~/.kube/baeji-prod-kubeconfig
 
 # ~/.zshrc
-alias k="kubectl"                                                                      # 개발 (기본 ~/.kube/config → ksd-eks)
-alias kprod="kubectl --kubeconfig=/home/ec2-user/.kube/baeji-prod-kubeconfig"         # 운영 (ksd-prod-eks)
+alias k="kubectl"                                                                      # 개발 (기본 ~/.kube/config → dev-eks)
+alias kprod="kubectl --kubeconfig=/home/ec2-user/.kube/baeji-prod-kubeconfig"         # 운영 (prod-eks)
 ```
 
 `k`는 개발, `kprod`는 운영. Git 브랜치 체크아웃처럼 전환하는 게 아니라, 명령마다 어떤 kubeconfig를 쓸지 명시하는 방식이다.
@@ -64,7 +64,7 @@ alias kprod="kubectl --kubeconfig=/home/ec2-user/.kube/baeji-prod-kubeconfig"   
 ```bash
 # 개발
 k -n develop get pods
-k logs -n develop -f spation-workspace-api-xxx
+k logs -n develop -f my-workspace-api-xxx
 
 # 운영
 kprod -n production get pods

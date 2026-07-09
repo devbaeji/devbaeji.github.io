@@ -25,12 +25,11 @@ description: 배지의 개발 블로그
 url: "https://devbaeji.github.io"
 
 github:
-  username: devbaeji
+  username: # 노출 방지: 비움
 
 social:
   name: Jiyeong Bae
-  links:
-    - https://github.com/devbaeji
+  links: []
 
 # Site Verification Settings
 webmaster_verifications:

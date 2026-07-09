@@ -83,7 +83,8 @@ tags: [태그1, 태그2]
 | Database  | MySQL, PostgreSQL, Redis                     |
 | DevOps    | GitHub Actions, Terraform                    |
 | AI        | Document AI, RAG, LLM, Agent                 |
-| Insight   | 트렌드, 회고                                  |
+| Insight   | 트렌드                                        |
+| 회고      | 프로젝트/도메인별 작업 회고 (배운 점 정리)   |
 | TIL       | 일상적인 배움 기록                            |
 
 ## 이미지 추가

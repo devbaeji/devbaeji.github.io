@@ -11,10 +11,10 @@ tags: [kubernetes, efs, pvc, multi-pod, production]
 
 ## 운영 클러스터 접속
 
-개발 클러스터(`ksd-eks`)는 기본 `kubectl`로 붙는데, 운영 클러스터(`ksd-prod-eks`)는 `~/.kube/config`에 등록하지 않고 별도 파일로 분리했다. 운영 접속 기록을 개발 config와 섞지 않기 위해서다.
+개발 클러스터(`dev-eks`)는 기본 `kubectl`로 붙는데, 운영 클러스터(`prod-eks`)는 `~/.kube/config`에 등록하지 않고 별도 파일로 분리했다. 운영 접속 기록을 개발 config와 섞지 않기 위해서다.
 
 ```bash
-aws eks update-kubeconfig --name ksd-prod-eks --region ap-northeast-2 \
+aws eks update-kubeconfig --name prod-eks --region ap-northeast-2 \
   --kubeconfig ~/.kube/baeji-prod-kubeconfig
 
 # ~/.zshrc
@@ -31,8 +31,8 @@ kprod -n production get pvc
 
 ```
 NAME                                   STATUS   VOLUME                     CAPACITY   ACCESS MODES   STORAGECLASS    AGE
-spation-workspace-web-image-cache      Bound    pvc-0b9f10f4-...           5Gi        RWX            efs-sc-nextjs   24h
-spation-workspace-worker-image-cache   Bound    pvc-a8247680-...           5Gi        RWX            efs-sc-nextjs   2d
+my-workspace-web-image-cache      Bound    pvc-0b9f10f4-...           5Gi        RWX            efs-sc-nextjs   24h
+my-workspace-worker-image-cache   Bound    pvc-a8247680-...           5Gi        RWX            efs-sc-nextjs   2d
 ```
 
 ![ArgoCD 리소스 트리 PVC](/assets/img/posts/image-optimization/argocd-tree-pvc.png)
@@ -45,12 +45,12 @@ web/worker를 하나의 PVC로 공유할 수도 있지만 분리가 맞다. 파�
 
 ## 3개 pod가 하나의 PVC를 공유
 
-운영 web pod 3개가 `spation-workspace-web-image-cache` PVC 하나를 동시 마운트하고 있다.
+운영 web pod 3개가 `my-workspace-web-image-cache` PVC 하나를 동시 마운트하고 있다.
 
 ```
-├── spation-workspace-web-58fbcdd898-qs7sg ──┐
-├── spation-workspace-web-58fbcdd898-tpnfz ──┼── spation-workspace-web-image-cache (EFS, RWX)
-└── spation-workspace-web-58fbcdd898-tzc5d ──┘
+├── my-workspace-web-58fbcdd898-qs7sg ──┐
+├── my-workspace-web-58fbcdd898-tpnfz ──┼── my-workspace-web-image-cache (EFS, RWX)
+└── my-workspace-web-58fbcdd898-tzc5d ──┘
 ```
 
 어느 pod로 요청이 들어와도 같은 볼륨을 보기 때문에 캐시 HIT율이 replica 수와 무관하게 유지된다.
