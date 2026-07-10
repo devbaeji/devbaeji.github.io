@@ -1,3 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>트랜잭션 생명주기 — 인터랙티브 스테퍼</title>
+<style>
+  :root{color-scheme:light}
+  html,body{margin:0}
+  body{max-width:1120px;margin:0 auto;padding:28px 20px 60px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+    background:#fff;color:#1f2328}
+  .page-back{display:inline-block;margin-bottom:14px;font-size:13px;color:#0969da;text-decoration:none}
+  .page-back:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<a class="page-back" href="javascript:history.back()">← 돌아가기</a>
 <!-- Activity log 트랜잭션 생명주기 인터랙티브 스테퍼 -->
 <!-- 14 단계 · vanilla JS · 이전/다음/처음 컨트롤 · 좌우 화살표 키 지원 -->
 <style>
@@ -508,6 +527,22 @@ var TX_SNIP = {
       txNext.disabled=txCur===txSteps.length-1;
       var c=document.querySelector('.activity-tx-lifecycle .tx-row.cur'); if(c)c.scrollIntoView({block:'nearest',behavior:'smooth'});
     }
-    txNext.onclick=function(){if(txCur<txSteps.length-1){txCur++;txRender();
-})();
+    txNext.onclick=function(){if(txCur<txSteps.length-1){txCur++;txRender();}};
+    txPrev.onclick=function(){if(txCur>0){txCur--;txRender();}};
+    txReset.onclick=function(){txCur=0;txRender();};
+    // 좌우 화살표: 스테퍼가 화면에 보일 때만 (페이지 스크롤 방해 방지)
+    document.addEventListener('keydown',function(e){
+      if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;
+      var box=document.querySelector('.activity-tx-lifecycle');
+      if(!box)return;
+      var r=box.getBoundingClientRect();
+      if(r.bottom<0||r.top>window.innerHeight)return;   // 화면 밖이면 무시
+      if(e.key==='ArrowRight')txNext.click();
+      if(e.key==='ArrowLeft')txPrev.click();
+    });
+    txRender();
+  })();
 </script>
+
+</body>
+</html>

@@ -163,9 +163,14 @@ fun activityJmsTemplate(...): JmsTemplate =
 
 ## 인터랙티브 — 한 단계씩 눌러보며 확인
 
-지금까지 설명한 T1·T2·AFTER_COMMIT·큐 발행이 실제로 어떤 순서로 실행되는지, 아래에서 **▶ 다음** 을 눌러가며 확인할 수 있다. 왼쪽 막대 = 트랜잭션이 살아있는 구간, 오른쪽 = 그 순간 실행되는 실제 코드 (노란 줄이 하이라이트).
+지금까지 설명한 T1·T2·AFTER_COMMIT·큐 발행이 실제로 어떤 순서로 실행되는지, 아래 스테퍼에서 **▶ 다음**·**◀ 이전**·**↺ 처음** 으로 단계별로 확인할 수 있다. 왼쪽 막대 = 트랜잭션이 살아있는 구간, 오른쪽 = 그 순간 실행되는 실제 코드 (노란 줄이 하이라이트). 코드 패널이 넓어 **전체 화면(새 창)** 에서 보는 것을 권장한다.
 
-{% include activity-tx-lifecycle.html %}
+<p>
+  <a href="/assets/interactive/activity-tx-lifecycle.html" target="_blank" rel="noopener"
+     style="display:inline-block;padding:11px 20px;border-radius:10px;background:#0969da;color:#fff;font-weight:700;text-decoration:none">
+    ▶ 트랜잭션 생명주기 인터랙티브 스테퍼 열기 (새 창)
+  </a>
+</p>
 
 ---
 
