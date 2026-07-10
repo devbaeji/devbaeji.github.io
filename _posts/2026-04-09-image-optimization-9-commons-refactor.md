@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (9) web/worker 중복 로직을 공통 패키지로 추출"
 date: 2026-04-09 20:00:00 +0900
-categories: [Frontend, Architecture]
+categories: [Infra, 이미지 최적화]
 tags: [nextjs, typescript, monorepo, refactoring, sharp, cache]
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: "멀티채널 알림 시스템 구축기 (4) - LocalStack으로 로컬 테스트"
 date: 2025-01-08 18:30:00 +0900
-categories: [Backend, AWS]
+categories: [Backend, 알림 시스템]
 tags: [localstack, docker, aws, sqs, sns, lambda, debugging, typescript]
 ---
 

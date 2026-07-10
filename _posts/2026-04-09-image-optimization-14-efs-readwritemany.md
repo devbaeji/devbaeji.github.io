@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (14) Multi-pod 캐시 공유 — EFS ReadWriteMany"
 date: 2026-04-09 23:45:00 +0900
-categories: [Infra, Kubernetes]
+categories: [Infra, 이미지 최적화]
 tags: [kubernetes, efs, pvc, cache, multi-pod]
 ---
 

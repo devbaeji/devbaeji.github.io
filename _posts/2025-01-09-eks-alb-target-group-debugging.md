@@ -1,7 +1,7 @@
 ---
 title: "EKS에서 ALB Target Group이 Unhealthy인데 서비스는 동작한다? 삽질 기록"
 date: 2025-01-09 14:00:00 +0900
-categories: [Infra, AWS]
+categories: [Infra, Kubernetes]
 tags: [eks, alb, target-group, kubernetes, troubleshooting]
 ---
 

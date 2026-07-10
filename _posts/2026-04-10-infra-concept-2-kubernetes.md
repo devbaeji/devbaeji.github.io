@@ -1,7 +1,7 @@
 ---
 title: "인프라 개념 정리 (2) 쿠버네티스 — Pod, Deployment, Node, 클러스터"
 date: 2026-04-10 15:20:00 +0900
-categories: [Infra, Kubernetes]
+categories: [Infra, 인프라 개념]
 tags: [kubernetes, pod, deployment, node, cluster]
 ---
 

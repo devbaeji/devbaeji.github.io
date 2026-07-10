@@ -1,7 +1,7 @@
 ---
 title: "인프라 개념 정리 (3) 쿠버네티스 스토리지 — EBS, EFS, PV, PVC, RWX"
 date: 2026-04-10 15:30:00 +0900
-categories: [Infra, Kubernetes]
+categories: [Infra, 인프라 개념]
 tags: [kubernetes, pvc, pv, ebs, efs, rwx, storage]
 ---
 

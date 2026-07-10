@@ -1,7 +1,7 @@
 ---
 title: "멀티채널 알림 시스템 구축기 (3) - Notifier Lambda 구현"
 date: 2025-01-08 18:00:00 +0900
-categories: [Backend, AWS]
+categories: [Backend, 알림 시스템]
 tags: [aws, lambda, gmail, slack, fcm, firebase, nodemailer, typescript]
 ---
 

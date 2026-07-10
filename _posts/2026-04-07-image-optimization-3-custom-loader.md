@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (3) Custom Loader — srcset은 살리고 프록시는 버리기"
 date: 2026-04-07 12:00:00 +0900
-categories: [Frontend, Next.js]
+categories: [Infra, 이미지 최적화]
 tags: [nextjs, image, custom-loader]
 ---
 

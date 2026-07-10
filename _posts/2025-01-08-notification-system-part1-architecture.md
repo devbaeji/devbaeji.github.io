@@ -1,7 +1,7 @@
 ---
 title: "멀티채널 알림 시스템 구축기 (1) - 아키텍처 설계"
 date: 2025-01-08 17:00:00 +0900
-categories: [Backend, AWS]
+categories: [Backend, 알림 시스템]
 tags: [aws, sqs, sns, lambda, architecture, notification, serverless]
 ---
 

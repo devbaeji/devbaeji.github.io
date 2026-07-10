@@ -1,7 +1,7 @@
 ---
 title: "한 브로커(ActiveMQ), 두 메시징 패턴 — 채팅(STOMP 토픽)과 활동 로그(VirtualTopic 큐)를 왜 다르게 구현했나"
 date: 2026-07-01 09:00:00 +0900
-categories: [Backend, Event-Driven]
+categories: [Backend, 활동 로그 파이프라인]
 tags: [ActiveMQ, STOMP, JMS, WebSocket, Spring]
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (11) 캐시 키에 path traversal 차단이 필요한 이유"
 date: 2026-04-09 22:00:00 +0900
-categories: [Backend, Security]
+categories: [Infra, 이미지 최적화]
 tags: [security, path-traversal, cache, nodejs]
 ---
 

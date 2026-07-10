@@ -1,7 +1,7 @@
 ---
 title: "모노레포에서 OpenAPI 타입을 중앙 집중 관리하는 방법"
 date: 2025-12-10 10:00:00 +0900
-categories: [Architecture, 설계 패턴]
+categories: [Backend, 아키텍처]
 tags: [monorepo, openapi, typescript, frontend, architecture]
 ---
 

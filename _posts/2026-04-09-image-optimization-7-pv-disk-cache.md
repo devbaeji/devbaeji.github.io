@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (7) EFS PV 캐시 — env 한 줄 누락 디버깅"
 date: 2026-04-09 18:00:00 +0900
-categories: [Infra, Kubernetes]
+categories: [Infra, 이미지 최적화]
 tags: [nextjs, kubernetes, efs, pvc, argocd, cache, debugging]
 ---
 

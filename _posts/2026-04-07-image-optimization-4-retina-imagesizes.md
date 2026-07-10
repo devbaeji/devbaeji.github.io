@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (4) 레티나 × imageSizes — 디자인 토큰으로 캐시 키 축소"
 date: 2026-04-07 13:00:00 +0900
-categories: [Frontend, Next.js]
+categories: [Infra, 이미지 최적화]
 tags: [nextjs, image, retina, design-token]
 ---
 

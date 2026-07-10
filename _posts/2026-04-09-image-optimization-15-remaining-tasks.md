@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (15) 남은 과제 — 캐시를 운영하려면"
 date: 2026-04-09 23:59:00 +0900
-categories: [Backend, Architecture]
+categories: [Infra, 이미지 최적화]
 tags: [cache, monitoring, testing, eviction, sharp]
 ---
 

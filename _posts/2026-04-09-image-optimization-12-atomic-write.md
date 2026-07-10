@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (12) 원자적 쓰기 — tmp + rename으로 파일 손상 방지"
 date: 2026-04-09 23:00:00 +0900
-categories: [Backend, Node.js]
+categories: [Infra, 이미지 최적화]
 tags: [nodejs, filesystem, cache, concurrency, posix]
 ---
 

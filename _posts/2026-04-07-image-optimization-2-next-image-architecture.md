@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (2) /_next/image 동작 구조"
 date: 2026-04-07 11:00:00 +0900
-categories: [Frontend, Next.js]
+categories: [Infra, 이미지 최적화]
 tags: [nextjs, image, optimization]
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: "이벤트 전달·정합성 패턴 — 현업 표준으로 보는 dual-write 문제와 4가지 해법 (그리고 우리는 왜 best-effort를 골랐나)"
 date: 2026-07-01 10:00:00 +0900
-categories: [Backend, Event-Driven]
+categories: [Backend, 활동 로그 파이프라인]
 tags: [Transactional-Outbox, CDC, Debezium, Kafka, ActiveMQ, Spring, Transaction]
 ---
 

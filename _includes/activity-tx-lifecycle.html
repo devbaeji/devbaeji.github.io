@@ -1,0 +1,513 @@
+<!-- Activity log 트랜잭션 생명주기 인터랙티브 스테퍼 -->
+<!-- 14 단계 · vanilla JS · 이전/다음/처음 컨트롤 · 좌우 화살표 키 지원 -->
+<style>
+.activity-tx-lifecycle {
+  --ink:#1f2328;
+  --muted:#656d76;
+  --line:#d1d9e0;
+  --accent:#0969da;
+  --panel:#f6f8fa;
+  --green:#1a7f37;
+  --green-bg:#dafbe1;
+  --yellow:#9a6700;
+  --yellow-bg:#fff8c5;
+  --red:#cf222e;
+  --red-bg:#ffebe9;
+  --todo:#5a4bcc;
+  --todo-bg:#eceaff;
+  color: var(--ink);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+.activity-tx-lifecycle h2 { font-size:19px; margin:32px 0 12px; border-left:4px solid var(--accent); padding-left:10px; }
+.activity-tx-lifecycle h3 { font-size:16px; margin:20px 0 10px; color: var(--ink); }
+.activity-tx-lifecycle h4 { font-size:14px; margin:16px 0 7px; color:var(--accent); }
+.activity-tx-lifecycle p { margin: 8px 0; }
+.activity-tx-lifecycle code { background:#eff1f3; padding:1px 5px; border-radius:4px; font-size:.88em; font-family: ui-monospace,SFMono-Regular,Menlo,monospace; }
+.activity-tx-lifecycle pre { margin:0; }
+.activity-tx-lifecycle .call { background: #fff8e1; border-left: 3px solid #e3b341; padding: 10px 14px; border-radius: 4px; font-size: 13px; margin: 12px 0; }
+.activity-tx-lifecycle .call.warn { background: #fff8e1; border-color: #e3b341; }
+.activity-tx-lifecycle button { font-family: inherit; }
+.activity-tx-lifecycle{ --tx-t1:#0969da; --tx-t2:#8250df; --tx-none:#656d76; --tx-evt:#9a6700; --tx-ok:#1a7f37; }
+  .activity-tx-lifecycle .tx-sub{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+  .activity-tx-lifecycle .tx-sub b{color:var(--ink)}
+
+  /* fan-out 다이어그램 */
+  .activity-tx-lifecycle .tx-fanout{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:16px}
+  .activity-tx-lifecycle .tx-fo-title{font-size:13.5px;font-weight:800;margin-bottom:10px}
+  .activity-tx-lifecycle .tx-fo-title b{color:var(--yellow)}
+  .activity-tx-lifecycle .tx-fo-src{text-align:center}
+  .activity-tx-lifecycle .tx-fo-box{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:700;
+    padding:7px 14px;border-radius:9px;border:1px solid var(--line);background:#fff}
+  .activity-tx-lifecycle .tx-fo-box.src{background:#fff8c5;border-color:#e8d27a;color:#7a5800}
+  .activity-tx-lifecycle .tx-fo-box.existing{background:#f0e9fb;border-color:#cdb8ee;color:#5a3aa8}
+  .activity-tx-lifecycle .tx-fo-box.mine{background:var(--green-bg);border-color:#9ad6a8;color:#11632b}
+  .activity-tx-lifecycle .tx-fo-meta{font-size:10.5px;color:var(--muted);margin-top:5px}
+  .activity-tx-lifecycle .tx-fo-meta code, .activity-tx-lifecycle .tx-fo-desc code{background:#eff1f3;color:#a3155f;padding:0 5px;border-radius:4px;font-size:.92em}
+  .activity-tx-lifecycle .tx-fo-split{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--yellow);
+    font-size:11px;font-weight:700;margin:11px 0 5px}
+  .activity-tx-lifecycle .tx-fo-split:before, .activity-tx-lifecycle .tx-fo-split:after{content:"";height:1px;width:60px;background:var(--line)}
+  .activity-tx-lifecycle .tx-fo-branches{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+  @media(max-width:700px){.tx-fo-branches{grid-template-columns:1fr}}
+  .activity-tx-lifecycle .tx-fo-branch{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+  .activity-tx-lifecycle .tx-fo-branch.b-existing{border-top:3px solid var(--tx-t2)}
+  .activity-tx-lifecycle .tx-fo-branch.b-mine{border-top:3px solid var(--tx-ok)}
+  .activity-tx-lifecycle .tx-fo-tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .activity-tx-lifecycle .tx-tg{font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:20px}
+  .activity-tx-lifecycle .tx-t-after{background:#ddf4ff;color:#0550ae}
+  .activity-tx-lifecycle .tx-t-new{background:#f0e9fb;color:#5a3aa8}
+  .activity-tx-lifecycle .tx-t-none{background:#eaeef2;color:#444}
+  .activity-tx-lifecycle .tx-fo-desc{font-size:11.5px;color:var(--muted);line-height:1.55}
+  .activity-tx-lifecycle .tx-fo-desc b{color:var(--ink)}
+  .activity-tx-lifecycle .tx-pill{font-size:9px;font-weight:800;padding:1px 7px;border-radius:20px;margin-left:6px;vertical-align:middle}
+  .activity-tx-lifecycle .tx-pill.old{background:#f0e9fb;color:#5a3aa8}
+  .activity-tx-lifecycle .tx-pill.new{background:var(--green-bg);color:var(--green)}
+  .activity-tx-lifecycle .tx-role{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:2px 9px;
+    border-radius:20px;margin-bottom:6px;border:1px solid}
+  .activity-tx-lifecycle .tx-role.send{background:#fff8c5;color:#7a5800;border-color:#e8d27a}
+  .activity-tx-lifecycle .tx-role.bus{background:#ddf4ff;color:#0550ae;border-color:#aecbf0}
+  .activity-tx-lifecycle .tx-role.recv{background:#eaeef2;color:#444;border-color:#d1d9e0}
+  .activity-tx-lifecycle .tx-fo-sub{font-size:10.5px;color:var(--muted);font-weight:600;margin-top:2px}
+  .activity-tx-lifecycle .tx-fo-sub b{color:var(--ink)}
+  .activity-tx-lifecycle .tx-fo-cause{font-size:10.5px;color:var(--green);font-weight:700;margin-top:9px}
+  /* 인과 체인 띠 */
+  .activity-tx-lifecycle .tx-chain{display:flex;align-items:stretch;gap:0;margin:8px 0 2px;border:1px solid var(--line);
+    border-radius:10px;overflow:hidden}
+  .activity-tx-lifecycle .tx-chain .ch{flex:1;padding:9px 11px;font-size:11px;position:relative;background:#fff}
+  .activity-tx-lifecycle .tx-chain .ch+.ch{border-left:1px solid var(--line)}
+  .activity-tx-lifecycle .tx-chain .ch b{display:block;font-size:11.5px;margin-bottom:2px}
+  .activity-tx-lifecycle .tx-chain .ch small{color:var(--muted);font-size:10px;line-height:1.45;display:block}
+  .activity-tx-lifecycle .tx-ch-1{background:#eef4fd} .tx-ch-1 b{color:#0550ae}
+  .activity-tx-lifecycle .tx-ch-2{background:#f6f1fc} .tx-ch-2 b{color:#5a3aa8}
+  .activity-tx-lifecycle .tx-ch-3{background:#eafaef} .tx-ch-3 b{color:#11632b}
+  .activity-tx-lifecycle .tx-chain .arrow{align-self:center;color:var(--yellow);font-weight:800;padding:0 4px;font-size:13px;background:#fff}
+
+  /* 컨트롤 바 */
+  .activity-tx-lifecycle .tx-top{display:flex;align-items:center;gap:12px;margin:6px 0 12px;flex-wrap:wrap}
+  .activity-tx-lifecycle .tx-txnow-lbl{font-size:13px;color:var(--muted)}
+  .activity-tx-lifecycle .tx-txbadge{font-size:14px;font-weight:800;padding:5px 14px;border-radius:10px;border:1px solid var(--line)}
+  .activity-tx-lifecycle .tx-b-t1{background:#ddf4ff;color:#0550ae;border-color:var(--tx-t1)}
+  .activity-tx-lifecycle .tx-b-t2{background:#f0e9fb;color:#5a3aa8;border-color:var(--tx-t2)}
+  .activity-tx-lifecycle .tx-b-none{background:#eaeef2;color:#444}
+  .activity-tx-lifecycle .tx-counter{font-size:13px;color:var(--muted)}
+  .activity-tx-lifecycle .tx-ctrl{margin-left:auto;display:flex;gap:8px}
+  .activity-tx-lifecycle .tx-ctrl button{background:#fff;border:1px solid var(--line);color:var(--ink);padding:8px 16px;
+    border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit}
+  .activity-tx-lifecycle .tx-ctrl button:hover{border-color:var(--tx-t1)}
+  .activity-tx-lifecycle .tx-ctrl button:disabled{opacity:.4;cursor:default}
+  .activity-tx-lifecycle .tx-ctrl .play{background:var(--tx-t1);color:#fff;border-color:var(--tx-t1)}
+
+  /* 본문 그리드: 스텝 리스트 + 코드패널 */
+  .activity-tx-lifecycle .tx-main{display:grid;grid-template-columns:1fr 480px;gap:16px;align-items:start}
+  @media(max-width:980px){.tx-main{grid-template-columns:1fr}}
+  .activity-tx-lifecycle .tx-legend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);margin-bottom:8px;flex-wrap:wrap}
+  .activity-tx-lifecycle .tx-legend span{display:inline-flex;gap:6px;align-items:center}
+  .activity-tx-lifecycle .tx-sw{width:14px;height:10px;border-radius:3px;display:inline-block}
+
+  .activity-tx-lifecycle .tx-rowwrap{display:grid;grid-template-columns:30px 30px 1fr;gap:0 12px;align-items:stretch}
+  .activity-tx-lifecycle .tx-head{font-size:10px;color:var(--muted);text-align:center;padding-bottom:5px;font-weight:700}
+  .activity-tx-lifecycle .tx-cell{position:relative;min-height:50px}
+  .activity-tx-lifecycle .tx-bar{position:absolute;left:50%;transform:translateX(-50%);width:10px;top:-9px;bottom:-9px;border-radius:6px;
+    background:#e2e7ee;box-shadow:inset 0 0 0 1px #d1d9e0}
+  .activity-tx-lifecycle .tx-row.on-t1 .c1 .tx-bar{background:var(--tx-t1);box-shadow:0 0 6px rgba(9,105,218,.35)}
+  .activity-tx-lifecycle .tx-row.on-t2 .c2 .tx-bar{background:var(--tx-t2);box-shadow:0 0 6px rgba(130,80,223,.35)}
+  .activity-tx-lifecycle .tx-node{display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;
+    background:#cdd5df;color:#fff;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    font-size:8px;font-weight:800;z-index:2;border:2px solid #fff}
+  .activity-tx-lifecycle .tx-row.on-t1 .c1 .tx-node{background:var(--tx-t1)}
+  .activity-tx-lifecycle .tx-row.on-t2 .c2 .tx-node{background:var(--tx-t2)}
+  .activity-tx-lifecycle .tx-row.cur .c1 .tx-node, .activity-tx-lifecycle .tx-row.cur .c2 .tx-node{outline:2px solid var(--ink)}
+  .activity-tx-lifecycle .tx-step{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin:5px 0;transition:.15s;opacity:.55}
+  .activity-tx-lifecycle .tx-row.cur .tx-step{opacity:1;border-color:var(--accent);box-shadow:0 0 0 1px rgba(9,105,218,.2)}
+  .activity-tx-lifecycle .tx-row.done .tx-step{opacity:.82}
+  .activity-tx-lifecycle .tx-step h4{margin:0;font-size:13px;display:flex;gap:8px;align-items:center;color:var(--ink)}
+  .activity-tx-lifecycle .tx-step code{background:#eff1f3;color:#0550ae;padding:0 5px;border-radius:5px;font-size:11px}
+  .activity-tx-lifecycle .tx-step .ev{font-size:9.5px;font-weight:800;padding:1px 7px;border-radius:20px;margin-left:auto;white-space:nowrap}
+  .activity-tx-lifecycle .tx-ev-flush{background:#fff8c5;color:#7a5800}
+  .activity-tx-lifecycle .tx-ev-commit{background:var(--green-bg);color:var(--green)}
+  .activity-tx-lifecycle .tx-ev-begin{background:#ddf4ff;color:#0550ae}
+  .activity-tx-lifecycle .tx-ev-begin2{background:#f0e9fb;color:#5a3aa8}
+  .activity-tx-lifecycle .tx-step p{margin:4px 0 0;font-size:11.5px;color:var(--muted)}
+  .activity-tx-lifecycle .tx-callout{margin-top:6px;font-size:11.5px;background:#fff8c5;border:1px solid #e8d27a;
+    color:#5c4400;border-radius:8px;padding:6px 9px}
+  .activity-tx-lifecycle .tx-callout b{color:var(--ink)}
+
+  .activity-tx-lifecycle .tx-codepanel{position:sticky;top:64px}
+  .activity-tx-lifecycle .tx-codepanel .file{font-size:12px;color:var(--muted);background:#0d1117;border:1px solid #2b3240;
+    border-bottom:none;border-radius:11px 11px 0 0;padding:8px 14px;font-weight:700}
+  .activity-tx-lifecycle .tx-codepanel .file b{color:#79c0ff}
+  .activity-tx-lifecycle .tx-codepanel pre{margin:0;background:#0d1117;border:1px solid #2b3240;border-radius:0 0 11px 11px;
+    padding:12px 0;overflow:auto;max-height:62vh}
+  .activity-tx-lifecycle .tx-cl{display:block;padding:1px 16px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;
+    white-space:pre;color:#c5d2e8;border-left:3px solid transparent}
+  .activity-tx-lifecycle .tx-cl.hl{background:rgba(154,103,0,.28);border-left-color:#e3b341;color:#fff}
+  .activity-tx-lifecycle .tx-cl .kw{color:#ff7b72}.tx-cl .an{color:#79c0ff}.tx-cl .fn{color:#d2a8ff}.tx-cl .st{color:#a5d6ff}.tx-cl .cm{color:#8b949e}
+  .activity-tx-lifecycle .tx-now{font-size:11.5px;color:#8b949e;background:#161b22;padding:8px 14px 0;border-left:1px solid #2b3240;border-right:1px solid #2b3240}
+  .activity-tx-lifecycle .tx-now b{color:#e3b341}
+
+</style>
+
+<div class="activity-tx-lifecycle">
+
+    <h2>⑤ 트랜잭션 생명주기 — 발행/적재/실시간 타이밍</h2>
+    <p class="tx-sub">▶ 로 한 단계씩. 왼쪽 막대 = 트랜잭션 살아있는 구간 / 오른쪽 = 그 순간 실행되는 <b>실제 코드(노란 줄)</b>.
+      <span style="color:var(--green)">교육용 일러스트는 작업자 출근(check-in) 예시 — 원본 가정대로 AttendanceHistory에 마커가 붙었다고 가정한다.
+      <b>단 현재 코드에서 실제로 <code>QueuePublishable</code> 마커가 붙은 건 TicketHistory 하나뿐이다.</b></span></p>
+
+    <!-- ===== fan-out 다이어그램 ===== -->
+    <div class="tx-fanout">
+      <div class="tx-fo-title">📡 전체 인과 흐름 — <b>비즈니스 DB → audit history → 큐 이벤트 로그</b></div>
+
+      <!-- 인과 체인 한 줄 요약 -->
+      <div class="tx-chain">
+        <div class="ch tx-ch-1">
+          <b>① 비즈니스 DB INSERT/UPDATE</b>
+          <small>도메인 변경(티켓 status·assignee / 예시: 출근 Attendance)을 T1 안에서 저장. <b>이게 모든 것의 원인(트리거).</b></small>
+        </div>
+        <div class="arrow">▶</div>
+        <div class="ch tx-ch-2">
+          <b>② audit history INSERT</b>
+          <small>①이 커밋되면 그 사실을 history 테이블에 기록 <span class="tx-pill old">기존</span></small>
+        </div>
+        <div class="arrow">▶</div>
+        <div class="ch tx-ch-3">
+          <b>③ 큐 이벤트 로그 발행</b>
+          <small>같은 변경을 ActiveMQ로 발행 <span class="tx-pill new">이번 PR</span></small>
+        </div>
+      </div>
+      <div class="tx-fo-sub" style="margin:6px 2px 4px">※ ②와 ③은 <b>순서대로 의존하는 게 아니라</b>, ①의 커밋이라는 <b>같은 원인</b>에서 갈라져 나온 <b>형제(독립 구독자)</b>다. ③이 ②의 완료를 기다리지 않음.</div>
+
+      <div class="tx-fo-split">아래는 그 갈라짐(fan-out)을 트랜잭션·이벤트버스 관점으로 본 그림</div>
+
+      <!-- 발신자 -->
+      <div class="tx-fo-src">
+        <span class="tx-role send">🟠 발신자 (PRODUCER)</span>
+        <div class="tx-fo-box src">eventPublisher.publishEvent(EntityHistoryEvent)</div>
+        <div class="tx-fo-meta"><b>EntityHistoryListener</b>(엔티티에 <code>@EntityListeners</code>로 물림)가 <b>flush 때 1번</b> 던짐 · 수신자가 누군지 모름. 이때 diff(<code>changes</code>)는 이미 <code>ActivityChangeHolder</code>에 담겨 있어 함께 실어 보냄.</div>
+      </div>
+
+      <!-- 우체통 -->
+      <div class="tx-fo-split"><span class="tx-role bus">🔵 우체통 (이벤트 버스)</span> &nbsp;커밋 성공까지 보류 → <b>AFTER_COMMIT</b>에 같은 이벤트를 구독자에게 <b>차례로</b> 배달 (T1 밖)</div>
+
+      <!-- 수신자들 -->
+      <div class="tx-fo-branches">
+        <div class="tx-fo-branch b-existing">
+          <span class="tx-role recv">🟣 수신자 ① (CONSUMER)</span>
+          <div class="tx-fo-box existing">EntityHistoryEventHandler<span class="tx-pill old">기존 audit · ②</span></div>
+          <div class="tx-fo-tags">
+            <span class="tx-tg tx-t-after">@AFTER_COMMIT</span>
+            <span class="tx-tg tx-t-new">REQUIRES_NEW → 새 T2</span>
+          </div>
+          <div class="tx-fo-desc"><b>DB에 history INSERT</b>를 해야 함. 그런데 T1은 이미 끝나 <b>열린 트랜잭션이 없음</b> → DB 쓰기용 트랜잭션 필요 → <b>REQUIRES_NEW로 새 T2</b>를 연다. 발신자가 누군지 모름.</div>
+        </div>
+        <div class="tx-fo-branch b-mine">
+          <span class="tx-role recv">🟢 수신자 ② (CONSUMER)</span>
+          <div class="tx-fo-box mine">ActivityEventRelay<span class="tx-pill new">이번 PR · ③</span></div>
+          <div class="tx-fo-tags">
+            <span class="tx-tg tx-t-after">@AFTER_COMMIT</span>
+            <span class="tx-tg tx-t-none">@Transactional 없음</span>
+          </div>
+          <div class="tx-fo-desc"><b>큐에 발행만</b> 하고 <b>DB는 안 씀</b> → 트랜잭션 자체가 불필요 → 아무 tx도 안 연다. 비즈니스 T1과 <b>엮일 여지가 원천적으로 없음</b>. (마커 <code>QueuePublishable</code> 붙은 것만 발행 — <b>현재 실제 마커는 TicketHistory뿐</b>, 아래 예시는 AttendanceHistory에 마커가 붙었다고 가정)</div>
+        </div>
+      </div>
+
+      <div class="tx-fo-cause">∴ 발신자는 "리스너를 안 고치고 수신자만 추가"가 가능 — ③(큐)은 ②(audit)를 건드리지 않고 우체통에 구독자 1개 더 붙인 것뿐.</div>
+    </div>
+
+    <!-- ===== 컨트롤 바 ===== -->
+    <div class="tx-top">
+      <span class="tx-txnow-lbl">현재 활성 트랜잭션:</span>
+      <span class="tx-txbadge" id="tx-txnow">없음</span>
+      <span class="tx-counter" id="tx-counter"></span>
+      <div class="tx-ctrl">
+        <button id="tx-prev">◀ 이전</button>
+        <button id="tx-next" class="play">다음 ▶</button>
+        <button id="tx-reset">↺ 처음</button>
+      </div>
+    </div>
+
+    <!-- ===== 스테퍼 본문 ===== -->
+    <div class="tx-main">
+      <div>
+        <div class="tx-legend">
+          <span><i class="tx-sw" style="background:var(--tx-t1)"></i> T1 (비즈니스)</span>
+          <span><i class="tx-sw" style="background:var(--tx-t2)"></i> T2 (REQUIRES_NEW)</span>
+          <span><i class="tx-sw" style="background:#e2e7ee"></i> 트랜잭션 없음</span>
+        </div>
+        <div class="tx-rowwrap"><div class="tx-head">T1</div><div class="tx-head">T2</div><div class="tx-head"></div></div>
+        <div id="tx-rows"></div>
+      </div>
+
+      <div class="tx-codepanel">
+        <div class="file" id="tx-codefile"></div>
+        <div class="tx-now" id="tx-codenow"></div>
+        <pre id="tx-code"></pre>
+      </div>
+    </div>
+
+    <!-- ===== 리뷰어 코멘트 해설 ===== -->
+    <h3>왜 "엮이지 않나" — 리뷰어 코멘트 해설</h3>
+    <div class="call warn">💬 리뷰어 코멘트: <b>"잘못 묶이면 원래 있는 트랜잭션과 엮이는 거 아닌가 모르겠습니다. REQUIRES_NEW는 트랜잭션을 하나 더 만들어서 괜찮을 듯한데."</b></div>
+    <p class="small">"엮인다"는 건 = <b>audit/큐 작업이 비즈니스 트랜잭션(T1) 안에 함께 묶여서, 부가작업이 실패하면 본 비즈니스(출근·티켓변경)까지 롤백되는 상황</b>. 같은 트리거를 어떻게 다느냐에 따라 결과가 갈린다.</p>
+    <table>
+      <thead><tr><th>방식</th><th>어디서 실행</th><th>트랜잭션</th><th>audit/큐 실패하면?</th><th>평가</th></tr></thead>
+      <tbody>
+      <tr>
+        <td><b>① 그냥 같은 메서드 안에서 호출</b><br><span class="muted">서비스 메서드 안에서 직접 발행</span></td>
+        <td>T1 내부 (커밋 전)</td>
+        <td>T1에 <span class="no">묶임</span></td>
+        <td>비즈니스까지 <span class="no">같이 롤백</span></td>
+        <td class="no">엮임 — 위험 ❌</td>
+      </tr>
+      <tr>
+        <td><b>② AFTER_COMMIT인데 REQUIRES_NEW 없이 DB 쓰기</b></td>
+        <td>커밋 후 (열린 tx 없음)</td>
+        <td><span class="no">tx 없음</span></td>
+        <td>DB 쓰기가 tx 없이 떠서 <span class="no">보장 안 됨/에러</span></td>
+        <td class="no">불완전 ❌</td>
+      </tr>
+      <tr style="background:rgba(26,127,55,.07)">
+        <td><b>③ AFTER_COMMIT + REQUIRES_NEW</b><br><span class="muted">EntityHistoryEventHandler (audit)</span></td>
+        <td>커밋 후 → 새 T2</td>
+        <td><span class="ok">새 T2 분리</span></td>
+        <td>비즈니스 유지, <b>audit만 유실</b></td>
+        <td class="ok">분리 성공 ✅</td>
+      </tr>
+      <tr style="background:rgba(26,127,55,.07)">
+        <td><b>④ AFTER_COMMIT + 트랜잭션 없음</b><br><span class="muted">ActivityEventRelay (큐, 이번 PR)</span></td>
+        <td>커밋 후</td>
+        <td><span class="ok">tx 자체 불필요</span></td>
+        <td>비즈니스 유지, <b>큐만 유실(로그)</b></td>
+        <td class="ok">DB 안 쓰니 OK ✅</td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <b>리뷰어 말의 핵심:</b><br>
+      • "잘못 묶이면 원래 트랜잭션과 엮인다" = <b>①번 걱정</b>. 부가작업을 T1 안에 두면 그게 실패할 때 본 비즈니스까지 날아간다.<br>
+      • "REQUIRES_NEW는 트랜잭션 하나 더 만들어서 괜찮을 듯" = <b>③번 해법</b>. DB에 써야 하는 audit은 <b>새 트랜잭션 T2</b>를 따로 열어 T1과 분리 → 서로 영향 없음.<br>
+      • 그리고 <b>우리 큐 발행(④)</b>은 한 발 더 나아가 <b>DB를 안 쓰니 트랜잭션 자체가 필요 없다</b> → REQUIRES_NEW조차 안 붙임 → T1과 엮일 일이 애초에 없음.
+    </div>
+    <div class="call good"><div class="t">우리 큐 발행(④)에서 diff는 언제?</div>큐 발행은 DB를 안 써서 tx 자체가 필요 없다. <b>단 diff 계산은 그 전</b>, T1 안의 flush(<code>EntityHistoryInterceptor.onFlushDirty</code>)에서 끝나며 <code>ActivityChangeHolder</code>에만 담아둔다 — 이건 메모리 홀더라 DB 쓰기가 아니다. 발행은 AFTER_COMMIT, diff는 커밋 전 flush — <b>타이밍이 다르다</b>.</div>
+
+    <!-- ===== 현업 표준 패턴 ===== -->
+    <h3>📚 현업 표준 — 이벤트 전달·정합성 패턴 (정보)</h3>
+    <p class="small">핵심 원칙: <b>"정답은 데이터 중요도가 정한다."</b> 정합성을 일부 포기하는 것도, 절대 안 포기하는 것도 <b>둘 다 표준</b>이다.
+      audit·알림·분석류는 흔히 best-effort로 싸게 가고, 돈·주문·재고·정산처럼 <b>반드시 전달돼야 하는 것만</b> Outbox/CDC로 승격한다.</p>
+
+    <div class="call bad"><div class="t">⚠️ Dual-write 안티패턴</div>"비즈니스 DB 커밋"과 "이벤트 발행"을 <b>서로 다른 작업으로 따로</b> 하면, 커밋은 됐는데 발행이 실패하는 틈이 생긴다(정합성 깨짐). <b>지금 우리 구조(AFTER_COMMIT 발행)가 바로 이 형태(G1)</b>. 보장이 필요하면 아래 Outbox/CDC로 이 안티패턴을 제거한다.</div>
+
+    <div class="call">
+      <div class="t">① Best-effort 비동기 발행 <span class="b b-ok">정합성 일부 포기</span> <span class="b b-ok">≈ 지금 우리 구조</span></div>
+      커밋 후(AFTER_COMMIT) 발행/기록을 따로 시도하고 실패는 <code>runCatching</code>으로 로그에 흡수. 부가기능이 본 비즈니스를 못 막게 <b>decoupling</b>이 목적.
+      <b>장점</b>: 단순·빠름·본 비즈니스 보호. <b>단점</b>: 드물게 <b>조용한 유실/불일치</b>(커밋 성공 + 기록 실패).
+      <b>적합</b>: 감사로그·활동피드·분석·알림 등 한두 건 빠져도 되는 데이터.
+      <div style="margin-top:6px;color:var(--green);font-size:12px">→ 현재 audit(<code>EntityHistoryEventHandler</code>, T2)·큐 발행(<code>ActivityEventRelay</code>)이 여기에 해당.</div>
+    </div>
+
+    <div class="call good">
+      <div class="t">② Transactional Outbox <span class="b b-ok">전달 보장</span> <span class="b b-ok">정합성 보장</span></div>
+      <b>비즈니스 데이터 + 이벤트(outbox 행)를 같은 트랜잭션(T1)으로 INSERT</b> → 커밋되면 이벤트도 무조건 함께 남음(원자적).
+      별도 <b>폴러/릴레이</b>가 outbox를 읽어 큐로 발행하고 성공 시 <code>published_at</code> 마킹(성공할 때까지 재시도).
+      <b>핵심</b>: T1 안엔 <b>로컬 INSERT만</b>(안전), 위험한 원격 발행은 T1 <b>밖</b>으로 미룸 → 리뷰어의 "엮임 회피" 원칙도 지킴.
+      <b>마이크로서비스의 사실상 표준 레시피.</b>
+    </div>
+
+    <div class="call">
+      <div class="t">③ CDC (Change Data Capture) <span class="b b-ok">전달 보장</span> <span class="b b-mid">대규모 적합</span></div>
+      <b>Debezium</b> 등이 DB 트랜잭션 로그(binlog/WAL)를 직접 읽어 Kafka로 발행. outbox 테이블 없이도 <b>"커밋된 것 = 곧 이벤트"</b>라
+      정합성이 DB 커밋에 자동으로 묶임. <b>장점</b>: 앱 코드 거의 무변경·고처리량. <b>단점</b>: 별도 인프라(Debezium/Kafka) 운영 부담.
+      <b>대규모·다수 서비스 환경에서 가장 흔한 실전 스택.</b>
+    </div>
+
+    <div class="call">
+      <div class="t">④ Event Sourcing <span class="b b-mid">특수 도메인</span></div>
+      상태를 저장하는 대신 <b>이벤트 자체를 진실의 원천</b>으로 삼고, 상태는 이벤트를 재생해 만든다.
+      정합성·이력추적이 강력하지만 <b>도입·운영 비용이 큼</b>. 금융 원장 등 특수 도메인에서 선택적으로.
+    </div>
+
+    <div class="call"><div class="t">💡 "exactly-once 전달"은 신화다</div>분산 시스템에서 정확히 한 번 전달은 사실상 불가능 →
+      현업의 실무 목표는 <b>at-least-once 전달(재시도로 안 잃음) + 멱등 소비자(eventId로 중복 무시) = exactly-once "효과"</b>. 결제 시스템조차 이 방식을 쓴다.</div>
+
+    <div class="call good"><div class="t">✅ 우리 결론</div>활동 이벤트가 <b>분석/피드용(유실 용인)</b>이면 ①(지금 구조)로 충분.
+      <b>전달 보장 + 정합성이 목표</b>라면 ②Transactional Outbox로 간다(이벤트 캡처를 T1 안으로).
+      기존 audit 재활용은 audit의 T1↔T2 정합성 틈을 물려받으므로 보장엔 부적합.</div>
+  
+</div>
+
+<script>
+(function() {
+var TX_SNIP = {
+      service:{title:'AttendanceService.kt  (예시 일러스트)', lines:[
+        '@Service',
+        'class AttendanceService(',
+        '  private val attendanceRepository: AttendanceRepository,',
+        ') {',
+        '  @Transactional                       // T1 시작/커밋 경계',
+        '  fun checkIn(cmd: CheckInCommand) {',
+        '    val attendance = Attendance(...)',
+        '    attendanceRepository.save(attendance)',
+        '    // ...비즈니스 로직...',
+        '  }                                    // 정상 종료 → T1 커밋',
+        '}',
+      ]},
+      interceptor:{title:'EntityHistoryInterceptor.kt  (Hibernate Interceptor)', lines:[
+        '@Component',
+        'class EntityHistoryInterceptor(',
+        '  private val activityDiffer: ActivityDiffer,',
+        ') : Interceptor {',
+        '  override fun onFlushDirty(                  // T1 안 flush, before/after',
+        '    entity, id, currentState, previousState, propertyNames, types,',
+        '  ): Boolean {',
+        '    val changes = activityDiffer.diff(        // REGISTRY 화이트리스트',
+        '      entity, propertyNames, previousState, currentState)',
+        '    if (changes.isNotEmpty())',
+        '      ActivityChangeHolder.put(entity, changes)  // 트랜잭션 스코프 홀더',
+        '    return false                              // 값은 안 바꿈',
+        '  }',
+        '}',
+      ]},
+      listener:{title:'EntityHistoryListener.kt', lines:[
+        '@Component',
+        'class EntityHistoryListener(',
+        '  private val eventPublisher: ApplicationEventPublisher,',
+        ') {',
+        '  @PostPersist fun postPersist(e: Any) = publish(e, INSERT)',
+        '  @PostUpdate  fun postUpdate(e: Any)  = publish(e, UPDATE)',
+        '',
+        '  private fun publish(entity: Any, op: OperationType) {',
+        '    if (entity !is HistoryTrackable<*>) return',
+        '    val history = entity.toHistorySnapshot(op, ...)',
+        '    val changes = ActivityChangeHolder.get(entity) ?: emptyList()',
+        '    eventPublisher.publishEvent(',
+        '      EntityHistoryEvent(history = history, changes = changes))',
+        '  }',
+        '}',
+      ]},
+      audit:{title:'EntityHistoryEventHandler.kt  (기존 audit)', lines:[
+        '@Component',
+        'class EntityHistoryEventHandler(',
+        '  private val entityManager: EntityManager,',
+        ') {',
+        '  @TransactionalEventListener(phase = AFTER_COMMIT)   // 커밋 후 실행',
+        '  @Transactional(propagation = REQUIRES_NEW)          // 새 트랜잭션 T2',
+        '  fun handle(event: EntityHistoryEvent) {',
+        '    entityManager.persist(event.history)              // T2에서 DB 저장',
+        '  }',
+        '}',
+      ]},
+      relay:{title:'ActivityEventRelay.kt  (이번 PR 신규)', lines:[
+        '@Component',
+        '@ConditionalOnProperty("activity.pipeline.enabled", havingValue = "true")',
+        'class ActivityEventRelay(',
+        '  @Qualifier("activityJmsTemplate") private val jmsTemplate: JmsTemplate,',
+        ') {',
+        '  @TransactionalEventListener(phase = AFTER_COMMIT)   // 커밋 후',
+        '  // @Transactional 없음 — DB를 안 써서 트랜잭션 불필요',
+        '  fun onEntityHistory(event: EntityHistoryEvent) {',
+        '    val history = event.history',
+        '    if (history !is QueuePublishable) return          // 현재 TicketHistory만 통과',
+        '    val message = ActivityEventMessage(',
+        '      entityType = history::class.simpleName, action = history.operationType.name,',
+        '      actorAccountId = history.operationBy, occurredAt = history.operationTimestamp,',
+        '      payload = objectMapper.valueToTree(history), changes = event.changes)',
+        '    runCatching { jmsTemplate.convertAndSend(topic, message) }  // best-effort',
+        '      .onFailure { log.warn(...) }',
+        '  }',
+        '}',
+      ]},
+    };
+
+    /* ---- 단계 ---- */
+    var txSteps=[
+      {t1:0,t2:0,h:'서비스 호출 전',ev:'',d:'아직 트랜잭션 없음.',now:'없음',code:'service',hl:[],note:'곧 checkIn() 진입'},
+      {t1:1,t2:0,h:'<code>checkIn()</code> 진입 → 트랜잭션 시작',ev:'begin',evl:'BEGIN T1',
+        d:'<code>@Transactional</code>이 여기서 <b>T1을 BEGIN</b>. 이후 DB 작업은 T1에 묶임.',now:'T1',code:'service',hl:[4],
+        c:'<b>@Transactional</b> = 진입 시 트랜잭션 열고, 정상 종료 시 커밋·예외 시 롤백.',note:'@Transactional → BEGIN T1'},
+      {t1:1,t2:0,h:'<code>save()</code> 호출',ev:'',d:'엔티티를 영속성 컨텍스트에 등록. <b>아직 SQL 안 나감</b>(쓰기 지연).',now:'T1',code:'service',hl:[7],note:'영속성 컨텍스트에만 등록'},
+      {t1:1,t2:0,h:'…비즈니스 로직…',ev:'',d:'검증/계산 등. 여전히 T1 안.',now:'T1',code:'service',hl:[8],note:'T1 진행 중'},
+      {t1:1,t2:0,h:'flush — 변경을 DB로 전송 → <b>Interceptor가 diff 계산</b>',ev:'flush',evl:'FLUSH+DIFF',
+        d:'커밋 직전 Hibernate가 쌓인 변경을 <b>실제 SQL로 전송</b>. 이 <code>onFlushDirty</code>에서 <code>previousState</code>(before)·<code>currentState</code>(after)가 메모리에 다 있어 <code>ActivityDiffer</code>가 diff 계산 → <code>ActivityChangeHolder</code>(트랜잭션 스코프)에 저장.',now:'T1',code:'interceptor',hl:[4,5,6,7,8,9,10],
+        c:'<b>diff는 여기(커밋 전 flush, T1 안)에서</b> 계산돼 홀더에만 담긴다 — DB 쓰기 아님. 별도 DB 조회 0(before/after가 Hibernate 메모리에 다 있음). 발행은 나중 AFTER_COMMIT.',note:'onFlushDirty → diff → 홀더에 저장'},
+      {t1:1,t2:0,h:'EntityHistoryListener → <b>HistoryTrackable 체크</b> → 홀더에서 changes 꺼내 이벤트 발행',ev:'flush',evl:'발행(예약)',
+        d:'<b>1차 관문</b>: <code>if (entity is HistoryTrackable)</code> — 추적 대상이면 스냅샷 생성, <code>ActivityChangeHolder.get(entity)</code>로 diff를 꺼내 <code>publishEvent(EntityHistoryEvent(history, changes))</code>. (audit·큐 공통 입구)',now:'T1',code:'listener',hl:[8,9,10,11,12,13],
+        c:'마커 ①<b>HistoryTrackable</b>=여기서 "이벤트 낼지". 마커 ②<b>QueuePublishable</b>은 나중에 relay(맨끝)에서 "큐로 보낼지". 이때 AFTER_COMMIT 구독자는 <b>예약만</b>(실행 X).',note:'HistoryTrackable이면 이벤트 발행(예약)'},
+      {t1:1,t2:0,h:'T1 커밋',ev:'commit',evl:'COMMIT T1',
+        d:'메서드 정상 종료 → <b>T1 커밋</b>. 비즈니스 기록(출근·티켓) DB 영구 확정.',now:'T1',code:'service',hl:[9],
+        c:'커밋 <b>성공</b> 시에만 다음 AFTER_COMMIT 단계로. (롤백이면 예약 구독자 미실행, 홀더는 정리됨)',note:'정상 종료 → COMMIT T1'},
+      {t1:0,t2:0,h:'T1 종료 → <b>AFTER_COMMIT</b>: 같은 이벤트가 <b>구독자 2명에게 fan-out</b>',ev:'',
+        d:'<b>T1 커밋엔 비즈니스 기록만 확정</b>(audit·큐는 T1에 안 들어감). 커밋 성공 후, 보류해둔 <code>EntityHistoryEvent</code>를 구독자에게 <b>차례로</b> 전달 — ①audit ②큐. 둘 다 <b>T1 밖</b>, 서로 의존 X(형제).',now:'없음',code:'listener',hl:[11,12,13],
+        c:'발행 때 바로 안 보내고 "T1 커밋되면 실행"으로 <b>콜백 등록</b>만 해뒀다가, 커밋 성공이 트리거가 돼 여기서 실행. ①audit과 ②큐는 같은 원인에서 갈라진 형제(순서 의존 X).',note:'fan-out — 커밋 후 구독자에게 전달'},
+      {t1:0,t2:1,h:'<span style="color:#5a3aa8">[구독자①·audit]</span> EntityHistoryEventHandler → 새 트랜잭션',ev:'begin2',evl:'BEGIN T2',
+        d:'audit 구독자 실행. <code>REQUIRES_NEW</code>라 <b>새 트랜잭션 T2를 BEGIN</b>.',now:'T2',code:'audit',hl:[4,5],
+        c:'<b>REQUIRES_NEW</b> = 기존 tx와 무관하게 새 트랜잭션을 연다. 열린 게 없으니 T2 신규 생성.',note:'audit: REQUIRES_NEW → BEGIN T2'},
+      {t1:0,t2:1,h:'<span style="color:#5a3aa8">[구독자①·audit]</span> <code>persist(history)</code>',ev:'',d:'T2 안에서 history를 <b>DB에 INSERT</b>. (진짜 history 저장은 여기)',now:'T2',code:'audit',hl:[7],note:'audit: T2에서 history INSERT'},
+      {t1:0,t2:1,h:'<span style="color:#5a3aa8">[구독자①·audit]</span> T2 커밋',ev:'commit',evl:'COMMIT T2',
+        d:'T2 커밋 → audit history 영구 저장.',now:'T2',code:'audit',hl:[6,7,8],
+        c:'T1과 <b>완전 별개</b>. T2가 실패해도 이미 커밋된 T1엔 영향 없음.',note:'audit: COMMIT T2'},
+      {t1:0,t2:0,h:'<span style="color:#11632b">[구독자②·큐]</span> ActivityEventRelay 수신 → <b>QueuePublishable 마커 체크</b> <span class="tx-pill new">이번 PR</span>',ev:'',
+        d:'<b>같은 이벤트</b>를 받는 또 다른 AFTER_COMMIT 구독자. 받자마자 <code>if (history !is QueuePublishable) return</code> — <b>꼬리표 검사로 큐로 보낼지 결정</b>. <b>현재 실제 마커는 TicketHistory뿐</b>(예시의 AttendanceHistory는 마커가 붙었다고 가정 → 통과).',now:'없음',code:'relay',hl:[7,8,9],
+        c:'분기: <b>마커(QueuePublishable) 붙은 것만</b> 통과 → 발행. 마커 없는 history면 여기서 return → 큐 안 함, audit만. 추적 대상(6번 HistoryTrackable)이라고 다 큐로 가는 게 아니라, 이 마커 붙은 것만 감. <b>현재 코드: TicketHistory 하나만 구현.</b>',note:'큐: 마커 有 → 통과'},
+      {t1:0,t2:0,h:'<span style="color:#11632b">[구독자②·큐]</span> ActivityEventMessage 구성 → JMS로 ActiveMQ 발행',ev:'',
+        d:'<code>ActivityEventMessage(entityType, action, actorAccountId, occurredAt, payload, changes=event.changes)</code>를 만들어 <code>runCatching { jmsTemplate.convertAndSend(topic, message) }</code>. <b>@Transactional 없음</b> → DB 안 씀 → tx 불필요. 실패는 <code>onFailure</code> 로그로 흡수(best-effort).',now:'없음',code:'relay',hl:[5,6,10,11,12,13,14,15],
+        c:'DB를 안 써서 <b>트랜잭션 불필요</b>. 비즈니스 T1과 절대 안 엮임. 발행 실패해도 로그만(비즈니스/audit 영향 X) = best-effort(G1). 메시지 top-level에 <b>workspaceId 없음</b> — workspace_id는 payload 안.',note:'큐: convertAndSend 발행 (best-effort)'},
+      {t1:0,t2:0,h:'완료',ev:'commit',evl:'DONE',
+        d:'비즈니스(T1) + audit(T2) + 큐 메시지 모두 완료.',now:'없음',code:'relay',hl:[],note:'모든 처리 완료'},
+    ];
+
+    /* ---- 간단 구문 강조 ---- */
+    function txEsc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function txHi(line){
+      var s=txEsc(line);
+      var toks=[];
+      var stash=function(cls,txt){var k=' '+toks.length+' ';toks.push('<span class="'+cls+'">'+txt+'</span>');return k;};
+      s=s.replace(/&quot;[^&]*&quot;/g,function(m){return stash('st',m);});
+      s=s.replace(/"[^"]*"/g,function(m){return stash('st',m);});
+      s=s.replace(/(\/\/.*)$/,function(m){return stash('cm',m);});
+      s=s.replace(/(@[A-Za-z]+)/g,function(m){return stash('an',m);});
+      s=s.replace(/\b(class|val|fun|private|override|return|is|if)\b/g,function(m){return stash('kw',m);});
+      s=s.replace(/ (\d+) /g,function(_,i){return toks[i];});
+      return s;
+    }
+
+    var txRows=document.getElementById('tx-rows');
+    if(!txRows) return;   // ⑤탭이 없는 경우 안전 종료
+    txSteps.forEach(function(s,i){
+      var wrap=document.createElement('div'); wrap.className='tx-rowwrap tx-row'; wrap.dataset.i=i;
+      var ec=s.ev==='flush'?'tx-ev-flush':s.ev==='commit'?'tx-ev-commit':s.ev==='begin'?'tx-ev-begin':s.ev==='begin2'?'tx-ev-begin2':'';
+      wrap.innerHTML=
+        '<div class="tx-cell c1"><div class="tx-bar"></div>'+(s.t1?'<div class="tx-node">T1</div>':'')+'</div>'+
+        '<div class="tx-cell c2"><div class="tx-bar"></div>'+(s.t2?'<div class="tx-node">T2</div>':'')+'</div>'+
+        '<div class="tx-step">'+
+          '<h4>'+(i+1)+'. '+s.h+' '+(s.ev?'<span class="ev '+ec+'">'+s.evl+'</span>':'')+'</h4>'+
+          '<p>'+s.d+'</p>'+(s.c?'<div class="tx-callout">'+s.c+'</div>':'')+
+        '</div>';
+      txRows.appendChild(wrap);
+    });
+
+    var txCur=0;
+    var txnow=document.getElementById('tx-txnow'),txcounter=document.getElementById('tx-counter');
+    var txCodeEl=document.getElementById('tx-code'),txFileEl=document.getElementById('tx-codefile'),txNowEl=document.getElementById('tx-codenow');
+    var txPrev=document.getElementById('tx-prev'),txNext=document.getElementById('tx-next'),txReset=document.getElementById('tx-reset');
+    function txRender(){
+      document.querySelectorAll('.activity-tx-lifecycle .tx-row').forEach(function(r,i){
+        r.classList.toggle('on-t1',txSteps[i].t1===1&&i<=txCur);
+        r.classList.toggle('on-t2',txSteps[i].t2===1&&i<=txCur);
+        r.classList.toggle('cur',i===txCur);
+        r.classList.toggle('done',i<txCur);
+        r.style.display=i<=txCur?'':'none';
+      });
+      var s=txSteps[txCur], now=s.now;
+      txnow.textContent=now; txnow.className='tx-txbadge '+(now==='T1'?'tx-b-t1':now==='T2'?'tx-b-t2':'tx-b-none');
+      txcounter.textContent='('+(txCur+1)+'/'+txSteps.length+')';
+      var snip=TX_SNIP[s.code];
+      txFileEl.innerHTML='📄 <b>'+snip.title+'</b>';
+      txNowEl.innerHTML='▶ 지금: <b>'+s.note+'</b>';
+      txCodeEl.innerHTML=snip.lines.map(function(ln,idx){return '<span class="tx-cl'+(s.hl.indexOf(idx)>=0?' hl':'')+'">'+(txHi(ln)||'&nbsp;')+'</span>';}).join('');
+      txPrev.disabled=txCur===0;
+      txNext.disabled=txCur===txSteps.length-1;
+      var c=document.querySelector('.activity-tx-lifecycle .tx-row.cur'); if(c)c.scrollIntoView({block:'nearest',behavior:'smooth'});
+    }
+    txNext.onclick=function(){if(txCur<txSteps.length-1){txCur++;txRender();
+})();
+</script>

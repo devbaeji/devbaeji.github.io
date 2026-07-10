@@ -1,7 +1,7 @@
 ---
 title: "Statement vs PreparedStatement: 차이점과 성능 최적화"
 date: 2025-12-11 10:00:00 +0900
-categories: [Backend, JDBC]
+categories: [Database, JDBC]
 tags: [jdbc, mysql, statement, preparedstatement, sql-injection, performance]
 ---
 

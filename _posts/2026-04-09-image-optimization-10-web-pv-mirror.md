@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (10) web PV 미러링 구성과 검증"
 date: 2026-04-09 21:00:00 +0900
-categories: [Infra, Kubernetes]
+categories: [Infra, 이미지 최적화]
 tags: [nextjs, kubernetes, efs, pvc, argocd, cache, verification]
 ---
 

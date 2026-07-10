@@ -1,7 +1,7 @@
 ---
 title: "인프라 개념 정리 (4) ArgoCD와 GitOps"
 date: 2026-04-10 15:40:00 +0900
-categories: [Infra, Kubernetes]
+categories: [Infra, 인프라 개념]
 tags: [argocd, gitops, kubernetes, cicd]
 ---
 

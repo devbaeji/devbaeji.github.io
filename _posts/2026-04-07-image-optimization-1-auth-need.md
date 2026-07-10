@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (1) 인증이 걸린 이미지에 CDN을 쓸 수 없을 때"
 date: 2026-04-07 10:00:00 +0900
-categories: [Frontend, Next.js]
+categories: [Infra, 이미지 최적화]
 tags: [nextjs, image, auth, s3, architecture]
 ---
 

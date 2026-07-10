@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (6) sharp가 Alpine에서 안 돌아간 이유"
 date: 2026-04-09 09:00:00 +0900
-categories: [Infra, Docker]
+categories: [Infra, 이미지 최적화]
 tags: [nextjs, sharp, docker, alpine, musl, glibc, debugging]
 ---
 

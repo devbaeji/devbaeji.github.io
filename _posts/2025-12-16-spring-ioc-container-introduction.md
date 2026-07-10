@@ -1,7 +1,7 @@
 ---
 title: "Spring IoC Container와 Bean 소개"
 date: 2025-12-16 15:00:00 +0900
-categories: [Spring Framework, Core Technologies, IoC Container]
+categories: [Backend, Spring]
 tags: [spring, ioc, di, dependency-injection, bean, container, applicationcontext]
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: "멀티채널 알림 시스템 구축기 (5) - 배포 및 트러블슈팅"
 date: 2025-01-08 19:00:00 +0900
-categories: [Backend, AWS]
+categories: [Backend, 알림 시스템]
 tags: [serverless, aws, sns, lambda, cloudformation, deployment, troubleshooting]
 ---
 

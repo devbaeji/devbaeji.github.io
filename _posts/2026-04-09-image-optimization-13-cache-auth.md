@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (13) 캐시 HIT에도 인증이 필요한 이유"
 date: 2026-04-09 23:30:00 +0900
-categories: [Backend, Security]
+categories: [Infra, 이미지 최적화]
 tags: [security, auth, cache, nextjs]
 ---
 

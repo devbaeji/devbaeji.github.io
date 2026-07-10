@@ -1,7 +1,7 @@
 ---
 title: "Charles Proxy로 모바일 앱 API 요청 디버깅하기"
 date: 2025-01-09 15:00:00 +0900
-categories: [Troubleshooting, Tools]
+categories: [Tools, 디버깅]
 tags: [charles-proxy, mobile, debugging, ios, android, api]
 ---
 

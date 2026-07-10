@@ -1,7 +1,7 @@
 ---
 title: "이미지 최적화 (16) 운영 PVC 검증 — 3 pod가 EFS 하나를 공유한다"
 date: 2026-04-10 15:00:00 +0900
-categories: [Infra, Kubernetes]
+categories: [Infra, 이미지 최적화]
 tags: [kubernetes, efs, pvc, multi-pod, production]
 ---
 
