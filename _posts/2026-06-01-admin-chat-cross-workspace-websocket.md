@@ -1,7 +1,7 @@
 ---
 title: "어드민 채팅 cross-workspace 실시간 회귀 — STOMP multi-subscribe 로 해결한 이야기"
 date: 2026-06-01 15:00:00 +0900
-categories: [Backend, 실시간]
+categories: [Backend, WebSocket]
 tags: [websocket, stomp, activemq, react-query, spring-messaging, system-design]
 ---
 
