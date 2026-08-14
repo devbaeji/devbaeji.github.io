@@ -1,0 +1,105 @@
+<style>
+  .sdp {
+    --bg: #0b1220; --panel: #131c30; --panel2: #1e293b; --text: #e2e8f0;
+    --muted: #94a3b8; --ok: #22c55e; --warn: #f59e0b; --accent: #38bdf8; --line: #334155;
+    background: linear-gradient(135deg, var(--bg) 0%, #050a16 100%);
+    color: var(--text); padding: 28px 22px; border-radius: 14px; margin: 24px 0;
+    font-family: -apple-system, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    line-height: 1.55;
+  }
+  .sdp * { box-sizing: border-box; }
+  .sdp .top {
+    background: linear-gradient(135deg, #1e3a5f, #142a45); border: 1.5px solid var(--accent);
+    color: #bae6fd; border-radius: 10px; padding: 12px 14px; text-align: center;
+    max-width: 480px; margin: 0 auto; font-size: 12.5px;
+  }
+  .sdp .top .ttl { font-weight: 700; margin-bottom: 4px; display: block; color: #e0f2fe; font-size: 13px; }
+  .sdp .fork { text-align: center; color: var(--muted); font-size: 12.5px; margin: 10px 0 14px; }
+  .sdp .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .sdp .grid { grid-template-columns: 1fr; } }
+  .sdp .panel { background: var(--panel); border: 1.5px solid var(--panel2); border-radius: 12px; padding: 18px; }
+  .sdp .panel.a { border-color: rgba(34, 197, 94, 0.55); }
+  .sdp .panel.b { border-color: rgba(245, 158, 11, 0.55); }
+  .sdp .lbl { display: inline-block; padding: 3px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; margin-bottom: 10px; letter-spacing: 0.3px; }
+  .sdp .lbl.a { background: var(--ok); color: #052e0e; }
+  .sdp .lbl.b { background: var(--warn); color: #3a2408; }
+  .sdp .h3 { font-size: 13px; margin: 4px 0 12px; color: var(--accent); font-weight: 600; }
+  .sdp .box {
+    background: var(--panel2); border: 1.5px solid var(--line); border-radius: 8px;
+    padding: 9px 12px; font-family: "SF Mono", Menlo, monospace; font-size: 11.5px; text-align: center;
+  }
+  .sdp .box .ttl { display: block; font-weight: 700; margin-bottom: 3px; }
+  .sdp .box small { display: block; color: var(--muted); font-size: 10.5px; line-height: 1.4; font-family: inherit; }
+  .sdp .box.hit { background: linear-gradient(135deg, #1f3a2a, #122a1d); border-color: var(--ok); color: #d1fae5; }
+  .sdp .box.s3 { background: linear-gradient(135deg, #3a2f14, #2a2210); border-color: var(--warn); color: #fde68a; }
+  .sdp .arrow { text-align: center; color: var(--muted); font-size: 11.5px; margin: 6px 0; }
+  .sdp .url {
+    margin-top: 12px; background: #0a1120; border: 1px dashed var(--line); border-radius: 8px;
+    padding: 9px 11px; font-family: "SF Mono", Menlo, monospace; font-size: 10.5px;
+    color: var(--muted); word-break: break-all; line-height: 1.5;
+  }
+  .sdp .url b { color: var(--text); font-weight: 700; }
+  .sdp ul.tr { list-style: none; padding: 0; margin: 12px 0 0; font-size: 11.5px; }
+  .sdp ul.tr li { padding: 4px 0; border-top: 1px solid var(--line); display: flex; gap: 7px; align-items: baseline; }
+  .sdp ul.tr li:first-child { border-top: 0; }
+  .sdp ul.tr .k { color: var(--muted); flex: none; width: 78px; }
+  .sdp .yes { color: #86efac; font-weight: 600; }
+  .sdp .no { color: #fca5a5; font-weight: 600; }
+  .sdp .caption { color: var(--muted); font-size: 12px; margin-top: 16px; text-align: center; line-height: 1.6; }
+  .sdp .caption b { color: var(--accent); }
+</style>
+
+<div class="sdp">
+  <div class="top">
+    <span class="ttl">버킷은 잠겨 있다 — 익명 접근 전면 차단</span>
+    그래도 파일을 밖으로 내보내는 길은 둘. <b>둘 다 버킷을 열지 않는다.</b>
+  </div>
+  <div class="fork">▼ &nbsp; 갈리는 지점은 <b>“누가 S3에 붙느냐”</b> &nbsp; ▼</div>
+
+  <div class="grid">
+    <div class="panel a">
+      <span class="lbl a">A · 서버 스트리밍</span>
+      <div class="h3">우리 서버가 S3에 붙는다</div>
+
+      <div class="box"><span class="ttl">브라우저</span><small>우리 도메인으로 요청</small></div>
+      <div class="arrow">↓ &nbsp;GET /api/files/{uuid}/stream</div>
+      <div class="box hit"><span class="ttl">우리 API</span><small>자격증명으로 서명해 대신 조회</small></div>
+      <div class="arrow">↓ ↑ &nbsp;바이트를 받아 그대로 중계</div>
+      <div class="box"><span class="ttl">S3 (비공개)</span><small>사용자는 이 주소를 모른다</small></div>
+
+      <div class="url">https://<b>app.example.com</b>/api/files<br>/019fd4d2-…-ceb091b87e26/stream</div>
+
+      <ul class="tr">
+        <li><span class="k">버킷 노출</span><span class="yes">없음</span></li>
+        <li><span class="k">유효기간</span><span class="yes">영구 · URL 고정</span></li>
+        <li><span class="k">응답 헤더</span><span class="yes">우리가 제어</span></li>
+        <li><span class="k">서버 부하</span><span class="no">전부 통과</span></li>
+      </ul>
+    </div>
+
+    <div class="panel b">
+      <span class="lbl b">B · presigned URL</span>
+      <div class="h3">클라이언트가 S3에 직접 붙는다</div>
+
+      <div class="box"><span class="ttl">브라우저</span><small>서명된 주소를 받아온다</small></div>
+      <div class="arrow">↓ ↑ &nbsp;GET /api/files/{uuid}/download</div>
+      <div class="box"><span class="ttl">우리 API</span><small>presigner 로 서명만 발급</small></div>
+      <div class="arrow">↓ &nbsp;브라우저가 그 URL 로 직접</div>
+      <div class="box s3"><span class="ttl">S3 (비공개)</span><small>서명만 검증 · 사람은 모른다</small></div>
+
+      <div class="url">https://<b>files-app-private-dev.s3.ap-northeast-2<br>.amazonaws.com</b>/attachments/2026/08/06/a1b2c3d4.png<br>?X-Amz-Expires=3600&amp;X-Amz-Signature=9f2c1b…</div>
+
+      <ul class="tr">
+        <li><span class="k">버킷 노출</span><span class="no">경로까지 드러남</span></li>
+        <li><span class="k">유효기간</span><span class="no">최대 7일 · 매번 변경</span></li>
+        <li><span class="k">응답 헤더</span><span class="no">S3 소관</span></li>
+        <li><span class="k">서버 부하</span><span class="yes">없음</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="caption">
+    축은 하나가 아니라 둘이다 — ① 서명이 붙나 &nbsp;② <b>누가 S3에 붙나</b>.<br>
+    A의 정체는 “서명이 없다”보다 <b>“애초에 S3 주소가 아니다”</b> 쪽이다.
+  </div>
+</div>

@@ -1,0 +1,77 @@
+<style>
+  .sdd {
+    --bg: #0b1220; --panel: #131c30; --panel2: #1e293b; --text: #e2e8f0;
+    --muted: #94a3b8; --ok: #22c55e; --warn: #f59e0b; --accent: #38bdf8; --line: #334155;
+    background: linear-gradient(135deg, var(--bg) 0%, #050a16 100%);
+    color: var(--text); padding: 28px 22px; border-radius: 14px; margin: 24px 0;
+    font-family: -apple-system, "SF Pro Text", "Apple SD Gothic Neo", "Pretendard", sans-serif;
+    line-height: 1.55;
+  }
+  .sdd * { box-sizing: border-box; }
+  .sdd .q { margin-bottom: 6px; }
+  .sdd .qrow { display: grid; grid-template-columns: 1fr 190px; gap: 14px; align-items: center; }
+  @media (max-width: 720px) { .sdd .qrow { grid-template-columns: 1fr; gap: 8px; } }
+  .sdd .ask {
+    background: var(--panel); border: 1.5px solid var(--panel2); border-left: 3px solid var(--accent);
+    border-radius: 10px; padding: 13px 15px; font-size: 13px;
+  }
+  .sdd .ask .n { color: var(--accent); font-weight: 700; margin-right: 7px; }
+  .sdd .ask small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 4px; }
+  .sdd .out {
+    border-radius: 9px; padding: 10px 12px; font-size: 11.5px; text-align: center;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .sdd .out b { display: block; font-size: 12.5px; margin-bottom: 3px; }
+  .sdd .out.a { background: linear-gradient(135deg, #1f3a2a, #122a1d); border: 1.5px solid var(--ok); color: #d1fae5; }
+  .sdd .out.b { background: linear-gradient(135deg, #3a2f14, #2a2210); border: 1.5px solid var(--warn); color: #fde68a; }
+  .sdd .down { text-align: center; color: var(--muted); font-size: 11.5px; margin: 4px 0 6px; }
+  .sdd .down b { color: var(--text); }
+  .sdd .note {
+    margin-top: 18px; background: #0a1120; border: 1px dashed var(--line);
+    border-radius: 10px; padding: 13px 15px; font-size: 12.5px; color: var(--muted); text-align: center; line-height: 1.65;
+  }
+  .sdd .note b { color: #fca5a5; }
+  .sdd .note em { color: var(--accent); font-style: normal; font-weight: 600; }
+</style>
+
+<div class="sdd">
+  <div class="q">
+    <div class="qrow">
+      <div class="ask">
+        <span class="n">Q1</span>중간에 끼어들어 무언가를 해야 하나?
+        <small>리사이즈 · 포맷 변환 · 접근 로깅 · 응답 헤더 제어</small>
+      </div>
+      <div class="out a"><b>A · 서버 스트리밍</b>presigned 는 원본 바이트를<br>그대로 내보낸다</div>
+    </div>
+  </div>
+
+  <div class="down">↓ &nbsp;<b>아니오</b></div>
+
+  <div class="q">
+    <div class="qrow">
+      <div class="ask">
+        <span class="n">Q2</span>URL 이 어딘가에 박제되나?
+        <small>알림 · 메시지 · 메일 — 새로고침이라는 수단이 없는 곳</small>
+      </div>
+      <div class="out a"><b>A · 서버 스트리밍</b>만료되면 복구 수단이<br>존재하지 않는다</div>
+    </div>
+  </div>
+
+  <div class="down">↓ &nbsp;<b>아니오</b></div>
+
+  <div class="q">
+    <div class="qrow">
+      <div class="ask">
+        <span class="n">Q3</span>파일 용량이 크고, 즉시 소비되나?
+        <small>원본 다운로드처럼 클릭하면 끝나는 트래픽</small>
+      </div>
+      <div class="out b"><b>B · presigned</b>서버가 중계할<br>이유가 없다</div>
+    </div>
+  </div>
+
+  <div class="note">
+    세 질문 어디에도 <b>“사용자가 로그인했나”</b>는 없다.<br>
+    presigned 는 원래 비로그인용 도구다 — 서명 자체가 통행증이라 쿠키도 토큰도 필요 없다.<br>
+    갈리는 기준은 <em>변환 지점이 필요한지</em>, 그리고 <em>URL 이 얼마나 오래 살아야 하는지</em>다.
+  </div>
+</div>
