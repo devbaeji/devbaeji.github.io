@@ -1,6 +1,6 @@
 ---
 name: writing-blog-callouts
-description: Use when writing or editing posts in _posts/*.md, especially when adding, editing, or reviewing callout (prompt) boxes. Defines the two callout formats (definition box, Q&A box) and the mandatory 4-step Q&A structure with concrete examples.
+description: Use when writing or editing posts in _posts/*.md, especially when adding, editing, or reviewing callout (prompt) boxes. Defines the two callout formats (definition box, Q&A box); personal experience goes in body prose, not boxes, and the mandatory 4-step Q&A structure with concrete examples.
 ---
 
 # 블로그 callout 작성 규칙
@@ -16,11 +16,11 @@ Chirpy 테마가 내장한 `prompt` 컴포넌트를 표준 callout으로 사용�
 | 마커 | 색상 | 용도 |
 |---|---|---|
 | `.prompt-info` | 파랑 | 정의 박스 / 개념 요약 박스, Q&A 박스의 기본 |
-| `.prompt-tip` | 초록 | **경험·근거 박스**(내가 실제 현업에서 쓴 근거·기억), 의사결정 가이드, 인사이트 |
+| `.prompt-tip` | 초록 | 의사결정 가이드, 인사이트 |
 | `.prompt-warning` | 노랑 | 운영 시 주의사항 |
 | `.prompt-danger` | 빨강 | 흔한 함정, 오해 |
 
-> **색상 일관성 규칙 (중요)**: 파랑(`.prompt-info`)은 항상 "개념 요약", 초록(`.prompt-tip`)은 항상 "내 경험·근거"로 고정한다. 독자와 작성자가 색만 보고 "이건 개념 / 이건 저자의 실경험"을 구분할 수 있어야 한다. 특히 **TIL 카테고리 글**은 이 두 색을 짝지어 쓰는 것을 표준으로 한다.
+> **경험은 박스에 넣지 않는다 (중요)**: 내가 실제로 겪은 일·판단은 callout 이 아니라 **본문에 1인칭 평서체**("~했다", "~를 알았다")로 쓴다. `From experience` 같은 경험 박스는 쓰지 않는다. 이 블로그는 포트폴리오로 제출될 수 있으므로, 글이 면접 대비용 정리로 읽히는 프레이밍(면접 질문 박스, "면접에서 답할 때" 절, "면접/현업에서 꺼낼 수 있게" 안내문)도 쓰지 않는다.
 
 ## 두 가지 callout 형식
 
@@ -41,7 +41,7 @@ Chirpy 테마가 내장한 `prompt` 컴포넌트를 표준 callout으로 사용�
 ### 2. Q&A 박스 — 실무에서 자주 마주칠 질문 + 모범 답안
 
 블로그를 읽고 자연스럽게 떠오를 만한 질문에, 결론 → 흐름/근거 → 측면 효과 순으로 **완결된 답을 정리한다.** 질문만 던지고 끝내지 않는다.
-면접/회의/온콜에서 실제로 답할 수 있는 수준이어야 한다.
+회의·온콜에서 실제로 쓸 수 있는 수준이어야 한다.
 
 ```markdown
 > **Q.** 화이트리스트가 정적 CSS 파일에서 추출된다. 패키지가 새 버전으로 install되면 ESLint가 자동으로 새 토큰을 알 수 있나?
@@ -56,21 +56,6 @@ Chirpy 테마가 내장한 `prompt` 컴포넌트를 표준 callout으로 사용�
 {: .prompt-info }
 ```
 
-### 3. 경험 박스 — 내가 실제로 쓴 근거·기억 (초록)
-
-개념을 **현업에서 언제·어떻게 썼는지**를 남겨, 나중에 면접·회의에서 "경험상 ~했던 기억이 있다"고 말할 수 있게 한다. 항상 **초록(`.prompt-tip`)** 으로 고정하고 머릿글은 `**From experience**`로 시작한다. (개념 요약 박스는 파랑, 경험 박스는 초록 — 색으로 성격을 구분)
-
-**공개 블로그이므로 사내 식별자(티켓번호·프로젝트/서비스명·내부 함수명 등)는 일반화**해서 쓴다. 회사를 특정할 수 없게 하되, "무슨 상황에서 왜 그 선택을 했는지"는 구체적으로 남긴다.
-
-```markdown
-> **From experience**
->
-> 카운트 배지의 소스 쿼리에 staleTime을 30초로 줬다. 합산 숫자는 실시간일 필요가 없어
-> 탭 전환·리마운트마다 refetch하면 낭비였고, 대신 배정 mutation 성공 후에만 invalidate로
-> 최신화했다. "평소엔 느슨하게, 변경 시엔 정확하게"가 기준이었다.
-{: .prompt-tip }
-```
-
 ## Q&A 박스의 4단 구조 (필수)
 
 1. **`Q.` 구체적·실무적 질문 한 줄** — 모호한 질문 금지. "어떻게 잘 하나?"가 아니라 "X와 Y 중 무엇을 고르나?"
@@ -83,16 +68,15 @@ Chirpy 테마가 내장한 `prompt` 컴포넌트를 표준 callout으로 사용�
 - **본문 흐름 중간**에 배치한다. 글 끝에 모아두지 않는다.
 - 정의 박스 → 해당 개념이 본문에 처음 등장한 직후
 - Q&A 박스 → 본문이 다룬 주제 직후, 자연스럽게 따라오는 의문 지점
-- 한 글에 **3~6개**가 적절하다. 정의 박스와 Q&A 박스를 섞는다.
+- callout 은 **꼭 필요할 때만** 쓴다(한 글에 0~3개). 위키식 용어 정의 박스를 개념마다 붙이지 않는다 — 본문 한두 문장으로 충분하면 본문에 쓴다.
 
 ## 금지 표현
 
 - 박스 머릿글에 분류 라벨 금지: ❌ "용어 정리", "심화 토픽", "면접 예상 질문", "필독", "체크리스트"
 - 학습 가이드 톤 금지: ❌ "이 글을 이해했다면 다음에 답할 수 있어야 한다"
-- 박스 머릿글은 오직 세 가지뿐:
+- 박스 머릿글은 오직 두 가지뿐:
   - 정의/개념 요약 박스 → `**개념명**` (파랑)
   - Q&A 박스 → `**Q.** 질문` (파랑)
-  - 경험 박스 → `**From experience**` (초록)
 
 ## 체크리스트
 
@@ -103,4 +87,4 @@ callout을 추가/편집한 뒤 다음을 확인한다.
 - [ ] 측면 효과 부분이 `*기울임*`으로 강조되어 있는가?
 - [ ] callout이 본문 흐름 중간에 자연스럽게 배치됐는가? 글 끝에 모여 있지는 않은가?
 - [ ] `{: .prompt-* }` 마커가 박스 끝에 붙어 있는가?
-- [ ] 한 글에 callout이 3~6개 범위인가?
+- [ ] callout 이 꼭 필요한 것만 남았는가(0~3개)? 경험을 박스가 아닌 본문 서술로 썼는가?

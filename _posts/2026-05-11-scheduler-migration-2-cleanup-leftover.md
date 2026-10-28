@@ -44,16 +44,7 @@ class AttendanceScheduler(...) {
 }
 ```
 
-`@ConditionalOnProperty` 가 단서.
-
-> **면접 질문 💼**
-> *"Spring 의 `@ConditionalOnProperty` 와 `matchIfMissing` 옵션은?"*
->
-> 특정 properties 값에 따라 빈을 등록할지 결정. `havingValue` 매칭 시 등록, 아니면 스킵.
->
-> `matchIfMissing` 은 *"yml 에 키가 아예 없을 때 어떻게 할지"* 의 기본값. `false` 면 키 없을 때 빈 등록 안 함 (안전), `true` 면 키 없어도 등록 (위험).
->
-> **마이그레이션 중간 상태에서 `false` 가 안전한 기본값.** 키를 깜빡 빼먹어도 자동 활성화되지 않는다.
+`@ConditionalOnProperty` 가 단서. yml 값이 `havingValue` 와 맞을 때만 빈을 등록하고, `matchIfMissing = false` 라서 키가 아예 없으면 등록하지 않는다. 키를 깜빡 빼먹어도 자동으로 켜지지 않으니 마이그레이션 중간 상태에선 안전한 기본값이다.
 
 yml 의 enabled 확인:
 
@@ -97,14 +88,7 @@ CREATE TABLE ticket_schedule_attendances (
 
 `UNIQUE` 제약 + `INSERT ... ON CONFLICT DO NOTHING`. **DB 가 마지막 방어선**. N+1 번 INSERT 가 날아가도 두 번째부터는 조용히 무시.
 
-> **면접 질문 💼**
-> *"멱등성 처리, 코드 레벨 vs DB 레벨 차이는?"*
->
-> 코드 레벨: 처리 전 *"이미 처리된 건지"* 조회 → 없으면 처리. 동시성 race 발생 가능 (TOCTOU 문제 — Time Of Check vs Time Of Use).
->
-> DB 레벨: UNIQUE 제약 + `INSERT ... ON CONFLICT DO NOTHING` (PG) / `INSERT IGNORE` (MySQL). 동시 race 가 와도 한 건만 살림.
->
-> **둘 다 적용**이 안전. 코드는 *"평소 경로의 99%"*, DB 는 *"이상 상황의 1%"* 최후 방어. 이번 잔재에서 DB 가 사고를 막아줬다.
+코드에서 *"이미 처리된 건지"* 조회한 뒤 처리하는 방식은 동시에 들어오면 둘 다 통과하는 TOCTOU race 가 생긴다. UNIQUE 제약은 race 가 와도 한 건만 살린다. 평소 경로는 코드가 막고, 이상 상황은 DB 가 최후로 막는 식으로 둘 다 두는 게 안전하다. 이번 잔재에서는 DB 가 사고를 막아줬다.
 
 데이터 중복은 없었지만 **DB SELECT/INSERT 부하는 N+1배**. 모니터링 그래프 상 매 5~10분마다 DB CPU 가 살짝 튀는 패턴이 이것.
 
@@ -174,21 +158,11 @@ PR 을 hard reset 하고 다시 시작.
 
 이번 PR 의 가장 큰 교훈. 처음엔 *"이참에 dead code 도 같이 청소하자"* 라는 욕심으로 5 커밋을 만들었지만, 실제로 운영 문제를 해결하는 데 필요한 건 yml 2줄이었다.
 
-> **면접 질문 💼**
-> *"리팩토링 PR 사이즈를 어떻게 결정하시나요?"*
->
-> *"이 문제를 해결하는 데 정말 필요한 최소 변경이 무엇인지"* 부터 정의. dead code 청소, 네이밍 개선, 추상화 같은 부가 작업은 별도 PR 로 분리. 한 PR 에 여러 의도가 섞이면 리뷰가 어려워지고 revert 도 곤란해진다.
->
-> 이번 케이스: 운영 잔재 청소(yml flag flip) 와 dead code 정리(클래스 삭제) 는 별개 의도였는데 한 PR 에 묶었다가 dead code 가 진짜 dead 가 아니었음 (로컬 cron 용)을 뒤늦게 발견.
+운영 잔재 청소(yml flag flip)와 dead code 정리(클래스 삭제)는 별개 의도였는데 한 PR 에 묶었다가, 그 dead code 가 로컬 cron 용이라 진짜 dead 가 아니었다는 걸 뒤늦게 알았다. 부가 작업은 별도 PR 로 떼어야 리뷰도 revert 도 쉽다.
 
 ### 3. `@ConditionalOnProperty` + `matchIfMissing=false` 의 위력
 
 이 한 줄 안전장치가 이미 있었기 때문에 yml 하나만 바꾸면 끝났다. 만약 클래스에 게이팅이 없었다면 진짜로 클래스를 삭제해야 했을 것.
-
-> **면접 질문 💼**
-> *"환경마다 다른 동작이 필요할 때 Spring 에선 어떻게 분리하나요?"*
->
-> `@Profile` + `@ConditionalOnProperty` 조합. 이번 케이스처럼 *"운영에선 false 가 기본, 로컬에선 true 가 기본"* 같은 환경별 동작 분기를 별도 클래스 추가 없이 같은 클래스로 처리 가능.
 
 ### 4. 마이그레이션 = 전환 + 청소
 

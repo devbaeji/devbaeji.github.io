@@ -447,29 +447,15 @@ html[data-mode="dark"] .defense-stack .post .stack-when { background: rgba(168, 
 
 ---
 
-## 9. 면접관이 자주 묻는 후속 질문
+## 9. 남은 고민
 
-이 시스템을 면접에서 발표하면 받게 될 만한 질문들과 답변 방향:
+처음엔 eslint-plugin-tailwindcss를 시도했지만 v4 지원이 미흡했고, 우리 토큰의 atomic/semantic prefix를 인식하지 못했다. 직접 만든 룰은 100~150줄로 작고 우리 도메인에 정확히 맞는다. 그래도 표준 도구가 v4를 충분히 지원하면 옮겨갈 수 있게 짜 두었다. 지금의 inline rule은 임시 자체 빌드에 가깝다.
 
-### Q1. "ESLint 룰을 직접 만든 비용 vs eslint-plugin-tailwindcss 같은 표준 도구의 비용은?"
+CSS 파싱을 PostCSS가 아니라 정규식으로 한 것도 같은 판단이다. PostCSS는 정확하지만 룰 초기화 시점에 동기로 처리하기가 까다롭다. 우리 CSS는 우리가 만들어 형식을 통제할 수 있으니 정규식 5개로 충분했다. 외부에서 오는 CSS였다면 PostCSS를 썼을 것이다.
 
-**A**. eslint-plugin-tailwindcss를 시도했지만 v4 지원이 미흡. 우리 토큰 시스템(atomic/semantic prefix)을 인식 못 함. 직접 만드는 게 100~150줄로 작고, 우리 도메인에 정확히 맞춤. 다만 **표준 도구가 v4를 충분히 지원하면 마이그레이션 가능**한 형태로 룰을 작성. inline rule은 일종의 임시 자체 빌드.
+빈틈도 하나 있다. `text-balance` 같은 신규 Tailwind 유틸리티는 우리 prefix 패턴에 걸리지 않아 룰이 모르고 통과시킨다. false positive가 아니라 false negative라서 덜 위험한 쪽의 실수다.
 
-### Q2. "CSS 파일 파싱을 정규식으로 했는데 PostCSS로 안 한 이유는?"
-
-**A**. PostCSS는 정확하지만 ESLint 룰 초기화 시점에 동기 처리가 까다로움. 우리 CSS는 우리가 만든 거라 형식이 통제 가능하고, 정규식 5개로 충분. 만약 CSS가 외부에서 오는 거였으면 PostCSS 썼을 것.
-
-### Q3. "ESLint 룰이 ON일 때 false positive (가짜 알람)는 없나?"
-
-**A**. 디자인된 케이스에선 없음. 다만 한 케이스: `text-balance` 같은 신규 Tailwind 유틸리티가 추가되면 룰이 모르고 통과시킴 (우리 소유 prefix 패턴에 안 걸려서). 이건 false **negative**라 더 안전한 실수.
-
-### Q4. "토큰이 늘어나면 화이트리스트도 커지는데 메모리/성능 영향은?"
-
-**A**. 현재 ~250개 토큰. Set/Map 사용하므로 룩업 O(1). ESLint 시작 시 한 번 파싱하고 메모리에 상주. 영향 무시할 수준. 토큰이 1000개 넘어가면 PostCSS로 정확성 보강 고려.
-
-### Q5. "이 시스템을 모듈로 재사용 가능하게 만들 계획은?"
-
-**A**. 다음 단계로 `@org/eslint-plugin-design-system` 패키지화 계획. 다른 디자인 시스템 프로젝트에서 install 한 줄로 적용 가능하게. inline rule은 그 전 단계의 prototype.
+토큰은 지금 ~250개이고 Set/Map으로 O(1) 룩업을 하며, ESLint 시작 시 한 번 파싱해 메모리에 둔다. 성능 영향은 무시할 수준이다. 1000개를 넘어가면 PostCSS로 정확성을 보강할 생각이다. 다음 단계로는 `@org/eslint-plugin-design-system`으로 패키지화해서 다른 프로젝트에서도 install 한 줄로 쓰게 하려 한다. inline rule은 그 전 단계의 prototype이다.
 
 > **Q.** ESLint inline rule은 v9 flat config에서만 동작한다. 옛 `.eslintrc.json` 쓰는 팀은 못 적용 아닌가?
 >

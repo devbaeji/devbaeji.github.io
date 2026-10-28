@@ -29,3 +29,6 @@ assets/js/dist
 /*.md
 
 _drafts/
+
+# 면접 질문 정제본 (운영자 해설 포함, 로컬 전용)
+.claude/skills/writing-interview-posts/questions.json
